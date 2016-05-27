@@ -1,0 +1,903 @@
+{% extends "base.html" %}
+
+{% block title %}我的网盘{% endblock %}
+
+{% block leftMenuHome %}
+<li class="hover"><a href="{%url netPan.index.IndexHd %}"><img src="{{STATIC_URL}}img/png/home.png">我的网盘</a></li>
+{% endblock %}
+
+
+
+<!--二级功能展示区-->
+{% block topNavUl %}
+<ul>
+	<li><a id="uploadLink" rel="dialog" href="#upload"><img src="{{STATIC_URL}}img/png/cloud-upload.png"> 上传</a></li>
+	<li><a id="firstDowload" onclick="downFirstbtn();" rel="dialog" href="#layer"><img src="{{STATIC_URL}}img/png/cloud-download2.png"> 下载</a></li>
+	<li><a rel="dialog" href="#deleteDialog" onclick="deleteFile();"><img src="{{STATIC_URL}}img/png/delete2.png"> 删除</a></li>
+	<li><a rel="dialog" href="#shareDialog" onclick="checkSelects();"><img src="{{STATIC_URL}}img/png/share2.png"> 分享</a></li>
+	<li><a rel="dialog" href="#file" onclick="clearOlds()"><img src="{{STATIC_URL}}img/png/folder-add2.png"> 新建文件夹</a></li>
+	<li><a href="#" onclick="showLogs();"><img src="{{STATIC_URL}}img/png/log_info.png"> 历史记录</a></li>
+</ul>
+
+{% endblock %}
+
+
+<!--数据显示区-->
+{% block showContent %}
+    <div class="filePath">
+		<!-- <li class="pre"><a href="javascript:;"><span>返回上一级</span>&nbsp;&nbsp;| </a></li> -->
+		<li class="other" id="filepath">		
+			<a  href="javascript:;" ><input type="hidden" value="{{ path }}"></input>全部文件</a>
+			<span class="gray">&nbsp;&gt;&nbsp;&nbsp;</span>
+		</li>
+	</div>
+	<div class="table-c solide">
+		<table id="table" width="100%" border="0" cellspacing="0" cellpadding="0" >
+			<tr class="firstTr font-bold">
+				<td width="8%"><input type="checkbox" id="selAll" onclick="selectAll();" />全选</td>
+				<td>名称</td>
+				<td>上传日期</td>
+				<td>操作</td>
+		    </tr>
+			<div class="table-comment"  id="allcheck">
+				{%for file in files%}
+				<tr id="{{file.id}}" class="baseTr">
+					{%if file.is_folder == '0'%}
+					<td id="{{file.is_folder}}"><input type="checkbox" name="checkAll" id="checkAll" onclick="setSelectAll();"/></td>
+					<td ><img class="img-css" src="{{STATIC_URL}}img/png/file.png" /><input type="hidden" value="{{file.id}}" /><a class="hasLink" onclick="changeIdfile(this);"  href="{% url netPan.File.views.browserFile file.id%}" title="点击预览">{{file.name}}</a></td>
+					<td>{{file.upload_time}}</td>
+					<td>
+						<ul>
+							<li><a rel="dialog" href="#deleteDialog" onclick="deleteSigleFile(this);"><img title="删除" src="{{STATIC_URL}}img/png/delete-file.png" /></a></li>
+							<li><a rel="dialog" href="#shareDialog" onclick="checkSingleSelects(this);"><img title="分享" src="{{STATIC_URL}}img/png/share-file.png" /></a></li>
+							<li><a href="{% url netPan.File.views.downLoad file.id%}"><img title="下载" src="{{STATIC_URL}}img/png/cloud-download.png" /></a></li>
+							
+						</ul>
+					</td>
+					{%else%}
+					<td id="{{file.is_folder}}">
+						
+						<input type="checkbox" name="checkAll" id="checkAll" onclick="setSelectAll();"/>
+					</td>
+					<td>
+						<img class="img-css" src="{{STATIC_URL}}img/png/folder.png" />
+						<input type="hidden" value="B" /><a href="javascript:;" onclick="EnterFolder(this);">{{file.name}}</a></td>
+					<td>{{file.upload_time}}</td>
+					<td>
+						<ul>
+							<li><a rel="dialog" href="#deleteDialog" onclick="deleteSigleFile(this);"><img title="删除" src="{{STATIC_URL}}img/png/delete-file.png" /></a></li>
+							<li><a rel="dialog" href="#shareDialog" onclick="checkSingleSelects(this);"><img title="分享" src="{{STATIC_URL}}img/png/share-file.png" /></a></li>
+						</ul>
+					</td>
+					{%endif%}
+				</tr>
+				{%endfor%}
+			</div>
+		</table>
+	</div>
+{% endblock %}
+{% block addOperate %}
+<!-- 上传 -->
+<div id="upload" class="conBaseBox">
+		<div id="login-header" class="conBoxHeader">
+			<span>上传文件</span>
+			<a class="modal_close" href="#" title="关闭"></a>
+		</div>
+	    <div id="uploadContent" class="conBoxContent">
+	    	<!-- <p class="mb10">温馨提示:上传文档格式只限于.pdf .doc .docx .gif .jpg .png</p> -->
+			<input id="file_upload" type="file" name="file_upload" />
+			<div id="upload_oprate">
+				<a href="javascript:$('#file_upload').uploadify('upload','*')">上传全部</a>
+				<a href="javascript:$('#file_upload').uploadify('cancel','*')">取消全部</a> 
+			</div> 
+            <div id="fileQueue"></div>
+		</div>
+</div>
+
+<!--下载-->
+<div id="layer" class="conBaseBox">
+	<div id="signUp-header" class="conBoxHeader">
+		<span class="layerTop">下 载</span>
+		<a class="modal_close" href="#" title="关闭"></a>
+	</div>
+	<div class="conBoxContent">
+		<div id="download-comment" class="layerComment">您确定要下载所选文件吗？</div>
+		<div id="download-submit" class="layerBootom"></div>
+	</div>
+</div>
+
+<!--删除-->
+<div id="deleteDialog" class="conBaseBox">
+	<div id="deleteDialog-header" class="conBoxHeader">
+		<span class="layerTop">删 除</span>
+		<a class="modal_close" href="#" title="关闭"></a>
+	</div>
+	<div class="conBoxContent">
+		<div id="deleteDialog-comment" class="layerComment fontCenter">
+			<p>您确定要把文件放入回收站吗？</p>
+		    <p>（删除的文件可在“误删恢复”中还原）</p>
+			<p class="margin-top20">
+				<button id="deleteDialog-cancel" onclick="hideDialog();" class="layerBootom">取消</button>
+				<button id="deleteDialog-ok" class="layerBootom margin-right10">确定</button>
+			</p>
+		</div>
+	</div>
+</div>
+
+<!--分享-->
+<div id="shareDialog" class="conBaseBox">
+	<div id="shareDialog-header" class="conBoxHeader">
+		<span class="layerTop">分享文件</span>
+		<a class="modal_close" href="#" title="关闭"></a>
+	</div>
+	<div class="conBoxContent">
+		<div id="shareDialog-comment" class="layerComment">
+			<div id="tab-container" class='tab-container'>
+				<ul class='etabs' class="shareUl">
+					<li class='tab'><a href="#tab1">私密分享</a></li>
+					<li class='tab'><a href="#tab2">公共分享</a></li>
+			    </ul>
+
+				    <!-- Tab1 -->
+				<div id="tab1">
+				    <div id="userLists">
+				    	<ul>
+				    		{%for req in userlist%}
+				    		<li>
+				    			<label class="labelCss">
+				    				<span><input type="checkbox" value="{{req.email}}"></input></span>
+				    				<img src="{{STATIC_URL}}img/png/share.png" />
+				    				<span>{{req.email}}</span>
+				    			</label>
+				    		</li>
+				    		{%endfor%}
+				    	</ul>
+				    </div>
+				    <div id="resPermission1">
+				    	<select>
+				    		<option value="0">只读</option>
+				    		<option value="1">可读写</option>
+				    		<option value="2">下载</option>
+				    	</select>
+				    </div>
+
+
+					<div id="shareBtn" class="margin-top20">
+						<button id="newUserDialog-cancel" onclick="hideDialog();" class="layerBootom">取消</button>
+						<button id="newUserDialog-ok" class="layerBootom margin-right10">提交</button>
+					</div>
+				</div>
+
+				  <!-- Tab2 -->
+				<div id="tab2">
+				      <div id="resPermission2">
+				      	<select>
+				      		<option value="0">只读</option>
+				      		<option value="1">下载</option>
+				      	</select>
+				      </div>
+				  	<div id="shareBtn" class="margin-top20">
+				  		<button id="newUserDialog-cancel" onclick="hideDialog();" class="layerBootom">取消</button>
+				  		<button id="newUserDialog-ok-two" class="layerBootom margin-right10">提交</button>
+				  	</div>
+				</div>
+		    </div>
+		</div>
+	</div>
+</div>
+
+<!-- 新建文件夹 -->
+<div  id="file" class="conBaseBox">
+	<div id="signUp-header" class="conBoxHeader">
+		<span class="layerTop">新建文件夹</span>
+		<a class="modal_close" href="#" title="关闭"></a>
+	</div>
+	<div class="conBoxContent">
+		<div id="NewFile" class="layerComment">
+			<span>输入文件夹名 </span>
+			<input class="width180" id="folderName" type="text" />
+			<p id="newFile-info"></p>
+		</div>
+		
+		<div class="layerBootom"><button id="newFile-btn" onclick="bulidFile();" type="button">确定</button></div>
+	</div>
+</div>
+	
+{% endblock %}
+
+{% block extracss %}
+<link href="{{STATIC_URL}}css/uploadify.css" rel="stylesheet" type="text/css" />
+<style type="text/css">
+	.filePath{	height:20px;width:100%;margin:5px 0 0 0;}
+	.filePath li{list-style: none;margin: 0;}
+	.filePath li a {font-size: 12px;}
+	.filePath  .other{float: left;margin-left: 20px;}
+	.mb10{margin-bottom:10px;}
+	#newFile-info{color:red;font-size:14px;padding-left:100px;padding-top:3px;}
+	.img-css{margin-right:10px;}
+</style>
+<link href="{{STATIC_URL}}css/home.css" rel="stylesheet" type="text/css" />
+<link href="{{STATIC_URL}}css/tab.css" rel="stylesheet" type="text/css" />
+{% endblock %}
+
+{% block extrajs %}
+<script type="text/javascript" src="{{STATIC_URL}}js/swfobject.js"></script>
+<script type="text/javascript" src="{{STATIC_URL}}js/jquery.easytabs.min.js"></script>
+<script type="text/javascript" src="{{STATIC_URL}}js/jquery.hashchange.min.js"></script>
+<script type="text/javascript" src="{{STATIC_URL}}uploadify/jquery.uploadify.min.js"></script>
+<script type="text/javascript" src="{{STATIC_URL}}js/home.js"></script>
+<script type="text/javascript">
+    $(document).ready(function() {
+
+    	//上传
+	      // var fileUrl = $pp.$p; 
+	      $('#file_upload').uploadify({
+	        'swf': '{{STATIC_URL}}uploadify/uploadify.swf',
+	        'uploader':'{% url netPan.File.views.uploadifyScript %}',
+	        'queueID': 'fileQueue',
+	        'auto': false,//不自动上传
+	        'multi': true,//设置可以上传多个文件
+	        // 'queueSizeLimit':2, 
+	        'itemTemplate': '<div id="${fileID}" class="uploadify-queue-item">' +
+	                            '<span class="fileName">${fileName} (${fileSize})</span><span class="data"></span>' + 
+	                            '<span class="cancel-bar">' +
+	                               '<a href="javascript:$(\'#${instanceID}\').uploadify(\'cancel\', \'${fileID}\')">取消</a>' +
+	                            '</span>' +
+	                            '<span class="uploadify-bar">' +
+                                    '<a href="javascript:$(\'#${instanceID}\').uploadify(\'upload\', \'${fileID}\')">上传</a>' +
+	                            '</span>' +
+	                            '<div class="uploadify-progress">' +
+	                                 '<div class="uploadify-progress-bar"></div>' +
+	                            '</div>' +             
+	                        '</div>' ,
+	        'buttonText':'请选择文件', //定义显示在默认按钮<input>上的文本
+	        'removeCompleted':false,//使上传队列中的项目始终显示于队列中，直到点击了关闭按钮或者队列被清空。
+	        'fileSizeLimit':10240000,//设置上传文件大小单位kb
+	        'fileTypeExts':'*.pdf; *.gif; *.jpg; *.png; *.doc;*.docx',//定义允许上传的文件后缀
+	        'fileTypeDesc':'支持文档格式', //可选择的文件类型的描述。此字符串出现在浏览文件对话框的文件类型下拉菜单中               
+	        'onInit': function () {},
+	        'onError' : function (event,ID,fileObj,errorObj) {
+	                $('#id_span_msg').html("上传失败，错误码:"+errorObj.type+" "+errorObj.info);
+	            },
+	        'onSelect': function (file) { //每添加一个文件至上传队列时触发该事件
+	           // alert(file.name + '文件添加至上传队列');
+	        },
+	        'onSelectError': function(file,errorCode,errorMsg){
+	           // alert(file.name + '文件返回错误，没有添加到队列中');
+	            /*
+	                file
+	                返回错误的文件对象。
+
+	                errorCode
+	                返回的错误代码。在定义错误代码时可使用以下常量：
+	                QUEUE_LIMIT_EXCEEDED – 选定的文件数量超过了设置的限值
+	                FILE_EXCEEDS_SIZE_LIMIT – 文件的大小超过了设置的限值
+	                ZERO_BYTE_FILE – 0大小文件
+	                INVALID_FILETYPE – 文件类型不在设置的范围内
+
+	                errorMsg
+	                表示超过限值的错误信息。
+	            */
+	        },
+	        
+	        'onQueueComplete': function(file) { //队列中的所有文件被处理完成时触发该事件
+	                                          //queueData.uploadsErrored (上传失败)
+	            updateLists();
+	        },
+	        'onUploadStart': function(file){ //在开始上传之前的瞬间会触发该事件
+	            $('#file_upload').uploadify("settings", "formData", {'fileUrl':$pp.$p, 'fileSize':file.size});
+
+	        },
+	        'onUploadProgress': function(file, bytesUploaded, bytesTotal, totalBytesUploaded, totalBytesTotal){ //上传进度更新时触发该事件
+	            $('#progress').html('已上传 ' +totalBytesUploaded + ' 字节. ' + '共 ' +totalBytesTotal + ' 字节.');
+	        },
+	        'onUploadSuccess': function(file, data, response){//response:服务器端响应。上传成功为true，上传失败为false
+	            if(response == true){
+	            	$('#file_upload').uploadify('settings','removeCompleted','true');
+	            }
+	        },
+	        'onUploadError': function(file, errorCode, errorMsg, errorString){ //上传失败时触发该事件
+	            /*alert('文件 ' + file.name + '上传失败.' + ' 详细信息: ' + errorString);*/
+	        }
+	    }); 
+	     
+	     
+    });
+
+    function downFirstbtn(){  //下载
+        	var allitems = $('tbody tr:not(.firstTr):has(:checked)');
+        	var itemsLength = allitems.length;
+
+        	if(itemsLength < 1){
+        		$('#download-comment').text('您还未选择要下载的文件!');
+        		$('#download-submit').html('');
+        		return false;
+        	}else{
+        		$('#download-comment').text('您确定要下载所选文件吗？');
+        		var fileId = $(allitems[0]).attr('id');
+				$('#download-submit').html(
+						'<button id="downloadBtn" type="text">' +
+        			        '<a href="http://{{domain}}/file/download/'+fileId+'">确定</a>' +
+        			    '</button>'
+        			);
+        	}
+        }
+
+    function deleteFile(){  //批量删除
+    	var allitems = $('tbody tr:not(.firstTr):has(:checked)');
+    	var itemsLength = allitems.length;
+    	if(itemsLength > 0) {
+    		var fileIdArray = new Array();
+	    		for(var i=0; i<itemsLength; i++){  //可批量删除
+	    			fileIdArray.push($(allitems[i]).attr('id'));
+	    		}
+    		$('#deleteDialog-comment').html(
+    			'<p>您确定要把文件放入回收站吗？</p>' +
+			    '<p>（删除的文件可在“误删恢复”中还原）</p>' +
+				'<p class="margin-top20">' +
+					'<button id="deleteDialog-cancel" onclick="hideDialog();" class="layerBootom">取消</button>' +
+					'<button id="deleteDialog-ok" class="layerBootom margin-right10">确定</button>' +
+				'</p>'
+    		);
+
+    		$('#deleteDialog-ok').unbind('click').click(function(){
+	    		sendData(fileIdArray, function(){
+	    			updateLists();
+	    		});
+	    		hideDialog();
+
+
+    		});
+
+    	}else{
+    		$('#deleteDialog-comment').html('请先选择要处理的文件！');
+    	} 
+
+    	function sendData(fileIdArray, callback){  
+    		$.ajax({
+	            type:"post",
+	            dataType:"json",
+	            contentType:"application/x-www-form-urlencoded;charset=UTF-8",
+	            url:"{% url netPan.File.views.delFile%}",
+	            data:{
+	            	ids: JSON.stringify(fileIdArray)
+	            },
+	            success:function(data){
+	            	var message = data.message;
+	            	if(message == 'F'){
+	            		showInfo('删除成功');
+	            	    if(callback){
+	            			callback();
+	            		}
+	            	}else if(message == 'G'){
+	            		showInfo('删除失败');
+	            	}
+	            },
+	            error: function(xhr,textStatus,errorThrown){	            	
+	            }	            
+	        });
+        }
+       
+    }
+
+	function deleteSigleFile(_this){  //单个删除
+	    	var fileIdArray = new Array();
+		    fileIdArray.push($(_this).parent().parent().parent().parent().attr('id'));
+    		$('#deleteDialog-comment').html(
+    			'<p>您确定要把文件放入回收站吗？</p>' +
+			    '<p>（删除的文件可在“误删恢复”中还原）</p>' +
+				'<p class="margin-top20">' +
+					'<button id="deleteDialog-cancel" onclick="hideDialog();" class="layerBootom">取消</button>' +
+					'<button id="deleteDialog-ok" class="layerBootom margin-right10">确定</button>' +
+				'</p>'
+    		);
+
+    		$('#deleteDialog-ok').unbind('click').click(function(){
+	    		sendData(fileIdArray, function(){
+	    			updateLists();
+	    		});
+	    		hideDialog();
+
+    		});
+
+	    	function sendData(fileIdArray, callback){  
+	    		$.ajax({
+		            type:"post",
+		            dataType:"json",
+		            contentType:"application/x-www-form-urlencoded;charset=UTF-8",
+		            url:"{% url netPan.File.views.delFile%}",
+		            data:{
+		            	ids: JSON.stringify(fileIdArray)
+		            },
+		            success:function(data){
+		            	var message = data.message;
+		            	if(message == 'F'){
+		            		showInfo('删除成功');
+		            	    if(callback){
+		            			callback();
+		            		}
+		            	}else if(message == 'G'){
+		            		showInfo('删除失败');
+		            	}
+		            },
+		            error: function(xhr,textStatus,errorThrown){	            	
+		            }	            
+		        });
+	        }
+	    }	
+
+     //分享提交（二级菜单） 
+	function checkSelects(){   //批量图标-判断是否勾选文件
+	    	$('.labelCss span').find('input').attr('checked',false);
+	    	var fileNameId = $('tbody tr:not(.firstTr):has(:checked)');
+	    	if(fileNameId.length < 1){
+	    		showInfo('请勾选要分享的文件');
+	    		return false;	
+	    	}
+
+	    	var fileNameIdaArray = $('tbody tr:not(.firstTr):has(:checked)');
+	    	$('#newUserDialog-ok').unbind('click').click(function(){
+		     	shareFile(fileNameIdaArray);
+
+		    });
+
+		    $('#newUserDialog-ok-two').unbind('click').click(function(){
+		     	shareFilepublic(fileNameIdaArray);
+		     });
+
+	    }
+
+    //分享提交(单条)
+	function checkSingleSelects(_this){
+	    	$('.labelCss span').find('input').attr('checked',false);
+
+	    	var singleId = $(_this).parent().parent().parent().parent();
+	    	var fileNameIdaArray = [singleId];
+
+	    	$('#newUserDialog-ok').unbind('click').click(function(){
+		     	shareFile(fileNameIdaArray);
+
+		    });
+
+	    	$('#newUserDialog-ok-two').unbind('click').click(function(){
+		     	shareFilepublic(fileNameIdaArray);
+		     });
+
+	    }
+
+
+    function shareFile(fileNameId){ 	//分享
+    	 var input = document.getElementById("userLists").getElementsByTagName("input");
+           var count = 0;
+           var EmailAdd = new Array();
+           for(var i = 0; i < input.length; i ++){
+              if (input[i].checked==true){
+                    count ++;
+           	        EmailAdd.push($(input[i]).attr('value'));
+                }else{
+                	continue;
+                }
+           }         
+         
+           if(count == 0){
+               showInfo("请选择用户！");
+               return false;
+           }
+    	var selectNumber = $('#resPermission1 option:selected').val();	//选中的值
+    	
+    	  	 if(fileNameId.length == 0) {
+    	  	 	showInfo('请先勾选要分享文件');
+    	  	 	return false;
+    	  	 }else{
+    	  	    var fileNameIdArray = new Array();
+    	  	    for(var i=0; i<fileNameId.length; i++){ 
+    	  	    	var NotFile=$(fileNameId[i]).find('td:first').attr('id');
+    	  	    	
+    	  	    	if(NotFile == 1){
+    	  	    		showInfo('只能分享文件');
+    	  	    		hideDialog();
+    	  	    	}else{
+    	  	    		fileNameIdArray.push($(fileNameId[i]).attr('id'));
+    	  	    	}
+    	  	    }
+    	  	
+		    	var shareData = {
+		    		fileNameIdArray: fileNameIdArray,
+		    		EmailAdd:EmailAdd,
+		    		selectNumber: selectNumber
+		    	}
+		    	$.ajax({
+			            type:"post",
+			            dataType:"json",
+			            contentType:"application/x-www-form-urlencoded;charset=UTF-8",
+			            url:"{%url netPan.File.views.Share%}",
+			            data:{
+			            	shareData:JSON.stringify(shareData)
+			            },
+			            success:function(data){
+			            	var message = data.message;
+			            	if(data.message =='M'){
+			            		$('tbody tr td').find('input').attr('checked',false);
+			            		showInfo('分享成功');
+			            	}else if(message == 'N'){
+					           	showInfo('分享失败');
+					        }
+				    		hideDialog();	        
+			            },
+			            error: function(xhr,textStatus,errorThrown){
+			            	
+			            }
+
+			    });
+        }
+  }
+          
+    function shareFilepublic(fileNameId){  //公共分享
+    	var selectNumber = $('#resPermission2 option:selected').val(); //选中的值
+    	
+    	  	 if(fileNameId.length == 0) {
+    	  	 	showInfo('请勾选要分享文件');
+    	  	 	return false;
+    	  	 }else{
+    	  	    var fileNameIdArray = new Array();
+    	  	    for(var i=0; i<fileNameId.length; i++){ 
+    	  	    	var NotFile=$(fileNameId[i]).find('td:first').attr('id');
+    	  	    	
+    	  	    	if(NotFile == 1){
+    	  	    		showInfo('只能分享文件');
+    	  	    	   hideDialog();
+    	  	    	}else{
+    	  	    		fileNameIdArray.push($(fileNameId[i]).attr('id'));
+    	  	    	}
+    	  	    }
+    	  
+		    	var shareData = {
+		    		fileNameIdArray: fileNameIdArray,
+		    		selectNumber: selectNumber
+		    	}
+		    	$.ajax({
+			            type:"post",
+			            dataType:"json",
+			            contentType:"application/x-www-form-urlencoded;charset=UTF-8",
+			            url:"{%url netPan.File.views.pubShare%}",
+			            data:{
+			            	shareData:JSON.stringify(shareData)
+			            },
+			            success:function(data){
+			            	var message = data.message;
+			            	if(data.message=='R'){
+			            		$('tbody tr td').find('input').attr('checked',false);
+			            		showInfo('分享成功');
+			            	}else if(message == 'S'){
+					           	showInfo('分享失败');
+					        }else{
+					        	$('tbody tr td').find('input').attr('checked',false);
+					        	showInfo(message + '已分享');
+					        }
+					       hideDialog();
+			            },
+			            error: function(xhr,textStatus,errorThrown){
+			            	
+			            }
+
+			        });
+    		}
+    }
+
+    window.$pp = {         //path全局变量
+		$p : $("#filepath").find('a:last').find('input:hidden').attr('value')
+	}
+
+	$(document).keydown(function(event){   //新建文件(夹)
+		   		if(event.keyCode == 13){    //绑定回车
+		   			$('#newFile-btn').click();
+		   }
+	});
+
+	function clearOlds(){  //恢复界面最初状态
+		$("#folderName").attr('value','');
+    	$('#newFile-info').text('');
+	}
+
+ 	function bulidFile(){ //新建文件(夹)
+    	var folderName = $("#folderName").attr('value');
+    	//var filePath = $("#filepath").find('a:last').find('input:hidden').attr('value'); 
+    	var reg= /^[\u0391-\uFFE5A-Za-z0-9]+$/;   
+    	 
+    	if(folderName == ""){
+    		$('#newFile-info').text('文件夹名不能为空');
+
+    	}else if(reg.test(folderName)==false){
+    	    $('#newFile-info').text('输入只能包含汉字、字母、数字');
+    	}else if(folderName.length > 20){
+    		$('#newFile-info').text('输入长度要求不大于20个字符');
+    	}else{
+    		$.ajax({
+    			type:"post",
+    			dataType:"json",
+    			contentType:"application/x-www-form-urlencoded;charset=UTF-8",
+    			url:"{%url netPan.File.views.newFolder%}",
+    			data:{
+    				fileName : folderName,
+    				filePath : $pp.$p
+    			},
+    			success:function(data){
+    				var message = data.message;
+    				if(message == 'O'){
+    					showInfo('新建成功');
+    					updateLists();
+    				}else if(message == 'P'){
+    					showInfo('新建失败');
+    				}
+    				
+    				hideDialog();
+    			},
+    			error:function(xhr,textStatus,errorThrown){
+
+    			},
+    		});
+    	}
+    }
+
+    // <!--监听-->
+/*    window.addEventListener('popstate',function(e){
+        if(history.state){
+        	var state = e.state;
+        	$.ajax({
+    			type:state.type,
+	            dataType:state.dataType,
+	            contentType:state.contentType,
+	            url:state.url,
+	            data:state.data,
+	            success:function(data){
+	            	var allFiles = JSON.parse(data.myfiles);
+	            	if(allFiles.length != 0){
+	            		showLists(allFiles);
+	            	}else{
+	            		$('tbody').html('无数据记录');
+	            	}
+		            	
+	            },
+	            error: function(xhr,textStatus,errorThrown){
+	            	
+	            }
+	            
+    		});
+        } 
+    },false);
+
+    function btn_onclick(id, dom){
+    	loadPage(id, dom, function(){
+    		var state = {
+			    title: "title",
+			    url:"{% url netPan.File.views.myFile%}",
+			    type:"post",
+	            dataType:"json",
+	            contentType:"application/x-www-form-urlencoded;charset=UTF-8",
+	            data:{path:$pp.$p}
+			};
+    		history.pushState(state, null,"/index/");
+    	});
+    }
+
+    function loadPage(id, dom, callback){
+    	var req = new XMLHttpRequest();
+    	alert("fuck");
+    	req.open('GET','{% url netPan.File.views.viewFolder %}',false);
+    	req.send(null);
+    	if(req.status ==200){
+    		EnterFolder(dom);
+    		if (callback) {
+    			callback();
+    		}
+    	}
+    }*/
+    //OVER
+    function EnterFolder(dom){   //进入文件夹
+    	var fileNameId = $(dom).parent().parent().attr('id');
+    	if(fileNameId){
+    	$.ajax({
+    		type:"post",
+	            dataType:"json",
+	            contentType:"application/x-www-form-urlencoded;charset=UTF-8",
+	            url:"{% url netPan.File.views.viewFolder %}",
+	            data:{id:fileNameId},
+	            success:function(data){
+	            	var message = data.message;
+	            	if(data.message=='Y'){
+	            		//alert('打开成功');
+	            		var allFiles = JSON.parse(data.all_files);
+	            		$pp.$p = data.path;	
+	            		showLists(allFiles);
+
+	            	}else if(message == 'Z'){
+			           	showInfo('打开失败');
+			        }  	
+	            },
+	            error: function(xhr,textStatus,errorThrown){
+	            	
+	            }	            
+    	});
+    	}
+    }
+
+
+	function changeIdfile(_this){
+		var changeIdfile = $(_this).parent().parent().attr('id');
+		
+		$.ajax({
+    		type:"post",
+	            dataType:"json",
+	            contentType:"application/x-www-form-urlencoded;charset=UTF-8",
+	            //url:"",
+	            data:{id:changeIdfile},
+	            success:function(data){
+  	
+	            },
+	            error: function(xhr,textStatus,errorThrown){
+	            	
+	            }
+	            
+    	});
+	}
+    function updateLists(){ //更新列表数据
+    	$.ajax({
+    		type:"post",
+	            dataType:"json",
+	            contentType:"application/x-www-form-urlencoded;charset=UTF-8",
+	            url:"{% url netPan.File.views.myFile%}",
+	            data:{
+	            	path:$pp.$p
+	            },
+	            success:function(data){
+	            	var allFiles = JSON.parse(data.myfiles);
+	            	if(allFiles.length != 0){
+	            		showLists(allFiles);
+	            	}else{
+	            		$('tbody').html('暂无数据记录');
+	            	}
+		            	
+	            },
+	            error: function(xhr,textStatus,errorThrown){
+	            	
+	            }
+	            
+    	});
+	    		}
+
+	  function showLists(allFiles,dom){
+    		 var fileNameid = $(dom).parent().parent().attr('id');
+	    		$('tbody').empty().append(
+	    				'<tr class="firstTr font-bold">' +
+							'<td width="8%"><input type="checkbox" id="selAll" onclick="selectAll();" />全选</td>' +
+							'<td>名称</td>' +
+							'<td>上传日期</td>' +
+							'<td>操作</td>' +
+				        '</tr>'
+				        );
+	    	for(var i=0; i<allFiles.length; i++){
+	    			var item = allFiles[i].fields;
+	    			var pk = allFiles[i].pk;
+	    			var fileId = allFiles[i].pk;
+	    			var time = (item.upload_time).replace(/T/," ");
+	    			if(item.is_folder == 0){
+	    				$('tbody').append(
+		    				'<tr id='+ pk +' class="baseTr">' +
+								'<td><input type="checkbox" name="checkAll" id="checkAll" onclick="setSelectAll();" /></td>' +
+								'<td>' +
+								'<img class="img-css" src="{{STATIC_URL}}img/png/file.png" />' +
+								'<input type="hidden" value='+ pk +' /><a class="hasLink" href="http://{{domain}}/'+fileNameid+'" title="点击预览">'+item.name+'</a>' +
+								'</td>' +
+								'<td>'+time+'</td>' +
+								'<td>' +
+									'<ul>' +
+									    '<li><a rel="dialog" href="#deleteDialog" onclick="deleteSigleFile(this);"><img title="删除" src="{{STATIC_URL}}img/png/delete-file.png" /></a></li>' +
+										'<li><a rel="dialog" href="#shareDialog" onclick="checkSingleSelects(this);"><img title="分享" src="{{STATIC_URL}}img/png/share-file.png" /></a></li>' +
+										'<li><a href="http://{{domain}}/file/download/'+fileId+'"><img title="下载" src="{{STATIC_URL}}img/png/cloud-download.png" /></a></li>' +
+										
+									'</ul>' +
+								'</td>' +
+							'</tr>'
+		    			);
+
+	    			}else{
+	    				$('tbody').append(
+		    				'<tr id='+ pk +' class="baseTr">' +
+								'<td><input type="checkbox" name="checkAll" id="checkAll" onclick="setSelectAll();" /></td>' +
+								'<td>' +
+								'<img class="img-css" src="{{STATIC_URL}}img/png/folder.png" />' +
+								'<input type="hidden" value="B" /><a href="http://{{domain}}/'+fileNameid+'">'+ item.name +'</a>' +
+								'</td>' +
+								'<td>'+time+'</td>' +
+								'<td>' +
+									'<ul>' +
+										
+										'<li><a rel="dialog" href="#deleteDialog" onclick="deleteSigleFile(this);"><img title="删除" src="{{STATIC_URL}}img/png/delete-file.png" /></a></li>' +
+										'<li><a rel="dialog" href="#shareDialog" onclick="checkSingleSelects(this);"><img title="分享" src="{{STATIC_URL}}img/png/share-file.png" /></a></li>' +
+									'</ul>' +
+								'</td>' +
+							'</tr>'
+		    			);
+	    			}		
+	    	}
+	    	//必须写
+    		$('#table').alterBgColor();
+    		$("a[rel*=dialog]").leanModal({overlay:0.4, closeButton:".modal_close"}); //弹出框
+    }
+
+
+    function showLogs(){	//logs
+    	$.ajax({
+    		type:"post",
+	            dataType:"json",
+	            contentType:"application/x-www-form-urlencoded;charset=UTF-8",
+	            url:"{% url netPan.Log.views.fileLog%}",
+	            data:{
+	            	path:$pp.$p
+	            },
+	            success:function(data){
+	            	var allFiles = JSON.parse(data.all_logs);
+	            	if(allFiles.length != 0){
+	            		showLogLists(allFiles);
+	            	}else{
+	            		$('tbody').html('暂无数据记录');
+	            	}
+		            	
+	            },
+	            error: function(xhr,textStatus,errorThrown){
+	            	
+	            }
+	            
+    	});
+
+    	function showLogLists(allFiles){
+    		$('tbody').empty().append(
+				'<tr class="firstTr font-bold">' +
+					'<td>文件名</td>' +
+					'<td>操作</td>' +
+					'<td>时间</td>' +
+		        '</tr>'
+		        );
+
+    		for(var i=0; i<allFiles.length; i++){
+    			var fileName = allFiles[i].fields.name;
+    			var operation = allFiles[i].fields.operate;
+    			var time = (allFiles[i].fields.time).replace(/T/," ");
+    			var transOperate;
+
+    			if(operation == 'A'){
+    				transOperate = '上传';
+    			}else if(operation == 'B'){
+    				transOperate = '新建文件夹';
+    			}else if(operation == 'C'){
+    				transOperate = '删除';
+    			}else if(operation == 'G'){
+    				transOperate = '下载';
+    			}else if(operation == 'H'){
+    				transOperate = '分享';
+    			}
+
+				$('tbody').append(
+    				'<tr class="baseTr">' +
+						'<td>'+fileName+'</td>' +
+						'<td>'+transOperate+'</td>' +
+						'<td>'+time+'</td>' +
+					'</tr>'
+    			);
+
+    		}
+
+    	}
+    }
+
+   
+
+</script>
+
+<script type="text/javascript">
+    $(document).ready( function() {
+        $('#tab-container').easytabs();
+    });
+</script>
+
+{% endblock %}

@@ -1,0 +1,158 @@
+{%extends "base.html"%}
+{% block title %}资源搜索{% endblock %}
+
+{% block leftMenuSearch %}
+	<li class="hover"><a href="{%url netPan.File.views.searchFile%}"><img src="{{STATIC_URL}}img/png/search.png">资源搜索</a></li>
+{% endblock %}
+
+<!--二级功能展示区-->
+{% block showContent %}
+<div id="board_search">
+	
+	<form>     
+		<input type="text" id="searchInput"  name="search" class="sinput" placeholder="输入关键词并回车搜索" >
+	</form>
+	<button type="button" onclick="SerarchFile();" value="搜索" class="sbtn">搜索</button>
+	<p class="alert-info"></p>
+	
+</div>
+{% endblock %}
+
+{% block extracss %}
+<link href="{{STATIC_URL}}css/search.css" rel="stylesheet" type="text/css" />
+<style type="text/css">
+	.table-c{margin: 0px 10px 15px 200px;}
+	.pcss{padding-left:15px; padding-top:10px;color:#E84313;}
+	.btncss{display: inline-block;border: 1px solid #3e8f3e;background-color: #5cb85c;color: #fff;
+padding: 2px 5px; margin-right:20px;}
+    .btncss:hover{cursor:pointer;}
+</style>
+{% endblock %}
+
+
+
+{% block extrajs %}
+<script type="text/javascript">
+
+	function SerarchFile(){   //search
+    	var keyWords = $('#searchInput').val();
+    
+    	if(keyWords==""){
+    		$('.alert-info').text('请在输入框输入关键字');
+    	}else{
+
+    	$.ajax({
+	            type:"post",
+	            dataType:"json",
+	            contentType:"application/x-www-form-urlencoded;charset=UTF-8",
+	            url:'{%url netPan.File.views.Search%}',
+	            data:{
+	            	name:keyWords
+	            },
+	            success:function(data){
+	            	//alert(data.search_files);
+	            	var allFiles = JSON.parse(data.search_files);
+	            	//alert(allFiles);
+	            	if(allFiles.length != 0){
+	            		showLists(allFiles, keyWords);
+	            	}else{
+	            		errorlength(keyWords);
+	            	}        	
+	            },
+	            error: function(xhr,textStatus,errorThrown){	
+	            }
+	           
+	        });
+     	}
+ 	}
+
+ 	function research(){
+ 		window.location.href = '{%url netPan.File.views.searchFile%}' ;
+ 	}
+
+	function errorlength(keyWords){
+		$('#board_search').remove();
+			$('#board').empty().append(
+				'<div class="table-c solide" >'+
+				'<p class="pcss">' +
+				    '<button class="btncss" type="text" onclick="research();">搜 索</button>' +
+				    '<span>当前搜索关键词：'+keyWords+'</span>' +
+
+				'</p>'+
+				'<table id="table" width="100%" border="0" cellspacing="0" cellpadding="0" >'+
+					'<tr class="firstTr font-bold">' +
+						'<td width="8%"><input type="checkbox" id="selAll" onclick="selectAll();" />全选</td>' +
+						'<td>名称</td>' +
+						'<td>共享日期</td>' +
+						'<td>操作</td>' +
+			        		'</tr>'+
+			        	'</table>'+
+			        '<p class="p15"><bold>对不起，没有你想要的资源！</bold></p>'+
+			       '</div>'
+			        )
+	}
+
+	function showLists(allFiles,keyWords){
+		$('#board_search').remove();
+		$('#board').empty().append(
+			'<div class="table-c solide" >'+
+			'<p class="pcss">' +
+				    '<button class="btncss" type="text" onclick="research();">搜 索</button>' +
+				    '<span>当前搜索关键词：'+keyWords+'</span>' +
+
+			'</p>'+
+			'<table id="table" width="100%" border="0" cellspacing="0" cellpadding="0" >'+
+				'<tr class="firstTr font-bold">' +
+					'<td width="8%"><input type="checkbox" id="selAll" onclick="selectAll();" />全选</td>' +
+					'<td>名称</td>' +
+					'<td>共享日期</td>' +
+					'<td>操作</td>' +
+		        		'</tr>'+
+		        	'</table>'+
+		        '</div>'
+		        );
+		for(var i=0; i<allFiles.length; i++){
+			var item = allFiles[i].fields;
+			var pk = allFiles[i].pk;
+			
+			if(item.is_download == '1'){   
+				$('tbody').append(
+    				'<tr id='+ pk +' class="baseTr">' +
+						'<td><input type="checkbox" name="checkAll" id="checkAll" onclick="setSelectAll();"/></td>' +
+						'<td>'+
+						'<img class="img-css" src="{{STATIC_URL}}img/png/file.png" />' +
+						'<input type="hidden" value='+ pk +' /><a class="hasLink" title="点击预览">'+item.name+'</a>' +
+						'</td>' +
+						'<td>'+item.time+'</td>' +
+						'<td>' +
+							'<ul>' +
+								
+								'<li><a rel="dialog" href=""><img title="下载" src="{{STATIC_URL}}img/png/xiazai.png" /></a></li>'+
+							'</ul>' +
+						'</td>' +
+					'</tr>'
+    			)
+			}else{
+				$('tbody').append(
+    				'<tr id='+ pk +' class="baseTr">' +
+						'<td><input type="checkbox" name="checkAll" id="checkAll" onclick="setSelectAll();"/></td>' +
+						'<td>' +
+							'<img class="img-css" src="{{STATIC_URL}}img/png/folder.png" />' +
+							'<input type="hidden" value="B" />'
+							+ item.name +
+						'</td>' +
+						'<td>'+item.time+'</td>' +
+						'<td>' +
+							'<ul>'  +
+							'</ul>' +
+						'</td>' +
+					'</tr>'
+    			)
+			}
+		}
+		$('#table').alterBgColor();
+	    $("a[rel*=dialog]").leanModal({overlay:0.4, closeButton:".modal_close"}); //弹出框
+	}
+</script>
+{% endblock %}
+

@@ -1,0 +1,51 @@
+{%extends "base.html"%}
+{% block title %}协同处理{% endblock %}
+
+{% block leftMenuCoordination %}
+	<li class="hover"><a href="{%url netPan.File.views.coordinationFile%}"><img src="{{STATIC_URL}}img/png/chuli.png">协同处理</a></li>
+{% endblock %}
+
+<!--二级功能展示区-->
+{% block topNavUl %}
+
+{% endblock %}
+<!--数据显示区-->
+{% block showContent %}
+		<div id="board_Coordination">
+			<div class="table-c solide" >
+				<table id="table" width="100%" border="0" cellspacing="0" cellpadding="0" >
+					<tr class="firstTr font-bold">
+						<td width="8%"><input type="checkbox" id="selAll" onclick="selectAll();" />全选</td>
+						<td>名称</td>
+						<td>上传日期</td>
+						<td>操作</td>
+				    </tr>
+					<div class="table-comment"  id="allcheck">
+						<tr>
+							<td><input type="checkbox" name="checkAll" id="checkAll" onclick="setSelectAll();"/></td>
+							<td><a href="{%url netPan.File.views.coordinationToFile%}">CSS</a></td>
+						</tr>
+						<tr><td><input type="checkbox" name="checkAll" id="checkAll" onclick="setSelectAll();"/></td>
+							<td>CSS2</td>
+						</tr>
+					</div>
+				</table>
+			</div>
+		</div>
+{% endblock %}
+
+{% block extracss %}
+{% endblock %}
+
+{% block extrajs %}
+{% endblock %}
+
+
+
+
+
+
+
+
+
+

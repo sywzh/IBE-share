@@ -1,0 +1,587 @@
+/*去除浏览器样式*/
+body ,p,h1,h2,h3,h4,ul,li,form,th,td{
+	margin:0;
+	padding:0;
+}
+/*公用样式*/
+.width180 {width:180px;}
+.font-bold{font-weight:bold;}
+.margin-top20{margin-top:20px;}
+.margin-right10{margin-right:10px;}
+.hasLink:hover{text-decoration:underline;}
+body{
+	margin:auto 0;
+	background-position:center;
+	 background-size:100% 100%;
+	 width:100%;
+	 padding:0;
+	 min-width:960px;
+     font-size:14px;
+     font-family:"Helvetica Neue",Helvetica,"Hiragino Sans GB","Segoe UI","Microsoft Yahei",Tahoma,Arial,STHeiti,sans-serif;
+}
+nav ul li a{text-align: left;}
+nav ul li.hover a{
+	color:#fff;
+}
+nav ul li{padding-left:40px;}
+a{
+	font-size: 14px;
+    text-decoration:none;
+    text-align: center;
+}
+td a:link{color:#000;}
+td a:visited{color:#000;}
+td a:active{color:#000;}
+.img-css{margin-right:10px;}
+ul li{list-style-type:none;}
+/* 头部样式*/
+header{
+	background-color: #393939;
+	height: 60px;
+	color:#c7c7c7;
+	font-size: 16px;
+}
+.top_nav{
+	border-bottom:1px solid #e1e1e1;
+}
+.top_nav ul{
+	float:left;
+	list-style-type: none;
+}
+.top_nav ul li{
+	float:left;       /*li元素浮动向右排成一行*/
+}
+.top_nav li{
+    display:block;/*让a以块的形式显示*/
+    width:115px;/*设置宽度*/
+    height:38px;/*设置高度*/
+    padding-top: 12px;
+    text-align:center;/*设置文本对齐方式为居住*/
+    margin-left:15px;
+
+}
+.top_nav li a{
+	font-size: 16px;
+	color: #393939;
+	text-decoration: none;
+}
+.top_nav li a img{
+	vertical-align:bottom;
+}
+.top_nav li:hover{
+    border-bottom:3px solid rgba(216,76,49,0.4);
+
+}
+
+/* 表格-20140313 19:02*/
+.table-c{
+	border:1px solid #e1e1e1;
+	margin:13px 10px 15px 215px;
+	background-color:#fbfbfb;
+	-webkit-box-shadow: 0 0px 10px rgba(0, 0, 0, 0.10);
+    box-shadow: 0 0px 10px rgba(0, 0, 0, 0.10);
+}
+.table-c table{border-right:1px solid #EDEDED;padding-left: 10px; padding-right:10px;padding-top:10px;}
+.table-c table td{ height: 32px; border-left:1px transparent #F00;border-right:1px transparent #F00;border-bottom:1px solid #e1e1e1}
+.solide{overflow-x:hidden;overflow-y:auto;height:510px;}
+
+/*tbody tr td颜色*/
+.originColor{background-color: #fbfbfb;}
+.hoverColor{background-color: #f9f9f7;}
+.selectedColor{background-color: #f2f2ea;}
+
+#logo{
+  	float: left;                /* 左浮动*/
+	width:160px;
+	height:50px;
+}
+#volume{
+	display:inline;   
+	float:right;             /* 右浮动*/
+	margin:13px 20px 0 0;
+	font-size:16px;
+}
+#login{
+	float:right;                /* 右浮动*/
+	margin-top: 22px;
+}
+.dropdown{
+	display:none;
+	position: absolute;
+	z-index: 10;
+	right: 100px;
+}
+#show-time-li{
+	color:#c7c7c7;
+}
+#show-time-li:hover{
+	color:#fff;
+}
+.dropdown li{
+	border-bottom:1px solid #000;
+	list-style: none;
+	width:120px;
+	font-size:12px;
+	color:#fff; 
+	text-align:center; 
+	line-height:30px; 
+	background:#393939;
+	border-bottom:1px inset #000;
+	
+}
+.dropdown li:hover{
+	background-color:#424242;
+}
+
+.dropdown li a{
+	font-size: 12px;
+}
+.dropdown li a:visited{
+	color:#fff;
+}
+.dropdown li a:active{
+	color:#fff;
+}
+
+#user:hover{
+	cursor:pointer ;
+	color:#fff;
+}
+
+#user i {
+	position:relative;
+	height:0;
+	width:0;
+	left:5px;
+	top:14px;
+	border-width:5px;
+	border-style:solid;
+	border-color:#c7c7c7 transparent transparent transparent;
+	-webkit-transition:.5s;
+	-moz-transition:.5s;
+	-ms-transition:.5s;
+	-o-transition:.5s;
+	transition:.5s;
+	-webkit-transform-origin:6px 3px;
+	-moz-transform-origin:6px 3px;
+	-ms-transform-origin:6px 3px;
+	-o-transform-origin:6px 3px;
+	transform-origin:6px 3px
+}
+/*消息提示*/
+#msgHeader{
+	display:inline;
+	margin-right:40px;
+	 
+}
+#msgHeader img{
+	vertical-align: middle;
+}
+#msgHeader span{
+	text-align:center;
+	min-width:18px;
+	height:18px;
+	display:inline-block;
+	background-color:#E84313;
+	border-radius:2px;
+	padding:2px;
+	color:#fff;
+}
+
+#register, #user{
+	margin-right: 40px;			/* 注册与登录的边距*/
+	display: inline;
+}
+#login_href, #logOut_href{
+	display: inline;				/* 变化为行间元素*/
+	margin-right: 30px;
+	color:#c7c7c7;                 /* 注册与登录的边距*/
+	margin-top: -19px;
+
+}
+#register-btn a:link, #login-btn a:link{
+	color:#c7c7c7;
+}
+
+#logOut_href a, header a:link {
+	color:#c7c7c7;
+	text-decoration:none
+}    
+#logOut_href a:hover, header a:hover {
+	/*color:#16AC84;*/
+	color:#fff;
+}   
+#logOut_href a:active, header a:active {
+	/*color:#16AC84;*/
+	color:#fff;
+}  
+
+/* 主体块样式*/
+#main{
+	background-color: #16ac84;
+	height:620px;
+}
+.title{                                 /* for U*/
+	width:750px;
+	margin: 0px auto ;
+	line-height: 100px;
+	text-align: center;
+	font-size: 45px;
+}
+.title2{	                           /* 云存储*/
+	font-size: 24px;
+	width:768px;
+	margin: 0px auto ;
+	line-height: 30px;
+	text-align: center;
+}
+                                         /* 按钮样式*/
+.more {
+	margin:auto;
+	margin-top: 40px;
+	border: 0.6px solid #B4B4B4;
+	background: #FFFFFF;
+	color: black;
+	font-size: 16px;
+	font-family: "微软雅黑";
+	opacity: 0.5;
+	padding: 5px 0 5px 0;
+	text-align: center;
+	width: 80px; 
+}
+.more:hover {
+	 background: rgba(1,1,1,0.1);
+	 webkit-box-shadow: inset 0 0 1px 1px #eaeaea;
+	 box-shadow: inset 0 0 1px 1px #eaeaea;
+	 color: #222;
+	 cursor: pointer; 
+}
+
+  
+#banner{
+	margin: auto;
+	width: 880px;
+}
+
+#banner img{  
+	size: 120%;             /* 图片*/
+	margin-top: 43.5px;
+	vertical-align:text-top;
+	max-width:880px;
+   _width:expression(this.width<400px?"auto":"400px");
+}
+
+/* 说明块样式*/
+#explain{
+	background-color: #f2f2f2;
+	height:750px;
+}
+/* 第一个说明块样式*/
+#explain1{
+	float:left;
+	margin-top: 120px;
+	width:50%;
+	height:246px;
+	margin-left: 30px;
+}
+#txt1{
+	float: right;
+	width:40%;
+	text-align: center;
+	margin-top: 120px;
+}
+/* 第二个说明块样式*/
+#explain2{
+	float:right;
+	margin-top: 20px;
+	width:50%;
+	height:246px;
+	margin-left: 30px;
+}
+#txt2{
+	float:left;
+	width:40%;
+	text-align: center;
+	margin-top: 80px;
+}                     
+
+.login_dialog{
+	width:400px;
+	height: 240px;
+	background-color: #16ac84;
+}
+
+ /* home.html*/                                                                           
+#content{
+  	margin: auto 0;
+  	width: 100%;
+  	height: 600px;
+  	background-color: #f9f9f7;
+  }
+@media screen and (min-height: 801px) { 
+#content {height: 800px;} 
+}          
+nav{   
+  	float:left;
+  	clear:both;                                /* 左侧导航*/
+  	width:200px;
+  	height:600px;
+  	background-color: #393939;
+  }     
+  
+nav ul{
+  	padding: 0px 0px 40px 0px;
+  	list-style-type: none;
+  	text-align: center;
+  	line-height: 48px;                   /* ul图标*/
+  }
+
+nav a img{
+	padding-top:14px;
+	padding-right:6px; 
+	vertical-align: top;
+}
+  
+nav a{
+		font-size: 16px;
+	    display:block;
+    	color:#c7c7c7;
+    	text-decoration:none ;
+    }
+
+nav li:hover, .hover{
+	color:#fff;
+	background-color:#424242;
+}
+
+nav li a:hover{
+	color:#fff;
+}
+
+.topul_hover{
+    border-bottom:3px solid #E84313;
+} 
+
+.top_nav{
+	height:50px;
+	background-color: #f9f9f7;
+}             
+/* footer样式*/
+/* footer样式*/
+footer{
+	background-color: #393939;
+	height:35px;
+	text-align: center;
+	color: white;
+	font-size: 13px;
+	line-height: 18px;
+}
+footer a{
+	color:#FFFFFF;
+	/*color:#16ac84;*/
+}
+footer a:hover{
+	color:white
+}
+
+/*leanModal CSS for logining and signing up */
+/*author: dym*/
+#lean_overlay{
+	position: fixed;
+	z-index: 100;
+	top:0px;
+	left:0px;
+	height:100%;
+	width:100%;
+	background:#030303;
+	display:none;
+}
+
+.modal_close {
+	position: absolute;
+	top: 12px;
+	right: 12px;
+	display: block;
+	width: 14px;
+	height: 14px;
+	background: url(../img/modal_close.png);
+	z-index: 100;
+	opacity: 0.5;
+	/*for IE8及更早版本*/
+	filter:alpha(opacity=50);
+}
+.modal_close:hover{
+	opacity: 1;
+	/*for IE8及更早版本*/
+	filter:alpha(opacity=100);
+}
+
+/*登录，注册、修改密码弹出框样式 by dym 2014/3/18 */
+.baseBox{
+	width:390px;
+	background-color:#f9f9f7;
+	padding:5px 15px;
+}
+.boxHeader{
+	font-size:24px;
+	height:auto;
+	padding:10px 0px;
+	border-bottom:3px solid #e1e1e1;
+	color: #E84313;
+}
+.boxContent{
+	height:auto;
+	margin:0 auto;
+}
+.boxFooter{
+	height:30px;
+	background-color:#ccc;
+}
+
+/*通用弹出框 by duyanmei 2014/4/19*/
+.conBaseBox{
+	width:460px;
+	background-color:#f9f9f7;
+	padding:5px 0px;
+}
+.conBoxHeader{
+	font-size:24px;
+	height:auto;
+	padding:10px 15px;
+	border-bottom:1px solid #e1e1e1;
+	color: #E84313;
+}
+.conBoxContent{
+	height:auto;
+	margin:0 auto;
+	padding-bottom:0px 10px 10px 23px;
+}
+.conBoxFooter{
+	height:30px;
+	background-color:#ccc;
+}
+
+
+/*提示用户信息*/
+.infoWord{
+	display:none;
+	margin-top:15px;
+	color:#E84313;
+	text-align:center;
+}
+#login-form, #signUp-form{
+	margin-top: 5px;
+	margin-bottom:30px;
+	border-top: 1px solid #c1c1c1;
+	padding-top: 16px;
+	font-size:16px;
+}
+.forgetPW{
+	width: 100px;
+	height: 28px;
+	margin: auto 0;
+	text-align: right;
+	color: #000;
+}
+.forgetPW a{color: #000;}
+.forgetPW a:hover{
+	color:#E84313;
+}
+#login-submit, #signUp-submit{
+	border-radius:0 2px 2px 0; 
+	border:1px solid #3e8f3e; 
+	background-color:#5cb85c; 
+	cursor:pointer; 
+	font-size:16px; 
+	color:#fff;
+	margin-top:20px;
+	text-align:center;
+	padding-top:6px;
+	padding-bottom:6px;
+}
+
+#login-submit:hover, #signUp-submit:hover{
+	border:1px solid #398439; 
+	background-color: #47a447;
+}
+
+#login-form div, #signUp-form div{
+	margin:8px auto;
+	width:250px;
+}
+#login-form div label, #signUp-form div label{
+	/*color:#16ac84;*/
+	display:block;
+}
+
+#login-form input, #signUp-form input{
+	width:240px;
+	line-height:10px; 
+	margin-bottom: 10px; 
+	border:1px solid #c1c1c1; 
+	border-radius:2px 0 0 2px; 
+    height:30px;
+    display:block;
+    padding:0px 5px;
+}
+
+.signUp-submit{
+	width:100px; 
+	height:30px; 
+	margin:6px 0 2px 100px;
+	border-radius:0 2px 2px 0; 
+	border:1px solid #16ac84; 
+	background-color:#16ac84; 
+	cursor:pointer; 
+	display:inline-block; 
+	font-size:16px; 
+	vertical-align:middle; 
+	color:white;
+}
+.signUp-submit:hover{
+	background:#137E61;
+}
+
+/* 弹出框的总样式——hockor(2014-03-19)*/
+ .layerComment{
+ 	padding:20px 15px;
+ 	font-size:16px;
+}
+.layerBootom{
+	padding: 0px 15px 15px 0px;
+}
+.layerBootom button{
+	border:1px solid #3e8f3e; 
+	background-color:#5cb85c;
+	color:#fff;
+	text-align: center;
+	width: 80px;
+    height:30px;  
+	float:right;
+}
+.layerBootom button:hover {
+	 border:1px solid #398439; 
+	 background-color: #47a447;
+	 cursor: pointer; 
+}
+.layerBootom button a{
+	color:#fff;
+}
+.layerComment input{
+ 	margin: auto;
+ }
+
+/*错误提示样式*/
+span.error{
+	font-size:12px;
+	color:red;
+}
+
+/*列表样式*/
+.baseTr td span{margin-right:5px;}
+.baseTr td ul li{display:inline;padding:5px;}
+
+
+
+
+

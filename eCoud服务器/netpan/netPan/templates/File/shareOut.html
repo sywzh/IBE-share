@@ -1,0 +1,233 @@
+{%extends "base.html"%}
+{% block title %}分享记录-我分享{% endblock %}
+
+{% block leftMenuShare %}
+	<li class="hover"><a href="{%url netPan.File.views.shareFile%}"><img src="{{STATIC_URL}}img/png/share.png">分享记录</a></li>
+{% endblock %}
+
+<!--二级功能展示区-->
+{% block topNavUl %}
+<link href="{{STATIC_URL}}css/share.css" rel="stylesheet" type="text/css" />
+<ul>
+	<!-- {%url netPan.File.views.shareOutFile %}    {%url netPan.File.views.shareInFile %}-->
+	<li class="topul_hover"><a id="myShare-link" href="{%url netPan.File.views.shareOutFile%}"><img src="{{STATIC_URL}}img/png/shareout.png"> 我的分享</a></li>
+	<li ><a href="{%url netPan.File.views.shareInFile%}"><img src="{{STATIC_URL}}img/png/sharein.png"> 分享给我</a></li>
+	<li ><a href="{%url netPan.File.views.myPubShare%}"><img src="{{STATIC_URL}}img/png/publicshare.png"> 我的共享</a></li>
+	<li><a href="{%url netPan.Log.views.shareLog%}"><img src="{{STATIC_URL}}img/png/log_info.png"> 历史记录</a></li>
+</ul>
+{% endblock %}
+
+{%block showContent%}
+<div id="board_share">
+	<div class="table-c solide" >
+		<table id="table" width="100%" border="0" cellspacing="0" cellpadding="0" >
+			<tr class="firstTr font-bold">
+				<td width="8%"><input type="checkbox" id="selAll" onclick="selectAll();" />全选</td>
+				<td>名称</td>
+				<td>分享日期</td>
+				<td>分享对象</td>
+				<td>修改权限</td>
+		    </tr>
+			<div class="table-comment"  id="allcheck">
+			{%for file in files%}
+			<tr class="baseTr">
+				<td id="{{file.id}}"><input type="checkbox" name="checkAll" id="checkAll" onclick="setSelectAll();"/></td>
+				<td><img class="img-css" src="{{STATIC_URL}}img/png/file.png" />{{file.file.name}}</td>
+				<td>{{file.time}}</td>
+				<td>{{file.share_who}}</td>
+				<td>
+					<ul>
+						<li><a rel="dialog" href="#shareDialog" onclick="editRight(this);">修改权限</a></li>
+						<li><a rel="dialog" href="#CancelDialog" onclick="cancelShare(this);">取消分享</a></li>
+					</ul>
+				</td>
+			</tr>
+			{%endfor%}
+			</div>	
+		</table>
+	</div>
+</div>
+
+<!-- 修改权限 -->
+<div id="shareDialog" class="conBaseBox">
+	<div id="shareDialog-header" class="conBoxHeader">
+		<span class="layerTop">修改权限</span>
+		<a class="modal_close" href="#" title="关闭"></a>
+	</div>
+	<div class="conBoxContent">
+		<div id="shareDialog-comment" class="layerComment">
+		    <div id="resPermission">
+		    	<select>
+		    		<option value="0">可读写</option>
+		    		<option value="1">下载</option>
+		    	</select>
+		    </div>
+
+			<div id="shareBtn" class="margin-top20">
+				<button id="newUserDialog-cancel" onclick="hideDialog();" class="layerBootom">取消</button>
+				<button id="newUserDialog-ok-share" class="layerBootom margin-right10">提交</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!-- 取消分享 -->
+<div id="CancelDialog" class="conBaseBox">
+	<div id="CancelDialog-header" class="conBoxHeader">
+		<span class="layerTop">取消分享</span>
+		<a class="modal_close" href="#" title="关闭"></a>
+	</div>
+	<div class="conBoxContent">
+		<div id="CancelDialog-comment" class="layerComment fontCenter">
+			<p>您确定要取消分享吗？</p>
+			<p class="margin-top20">
+				<button id="deleteDialog-cancel" onclick="hideDialog();" class="layerBootom">取消</button>
+				<button id="CancelDialog-ok" class="layerBootom margin-right10">确定</button>
+			</p>
+		</div>
+	</div>
+</div>
+{% endblock %}
+
+{% block extracss %}
+<link href="{{STATIC_URL}}css/share.css" rel="stylesheet" type="text/css" />
+{% endblock %}
+
+{% block extrajs %}
+<script type="text/javascript">
+
+    function editRight(_this){	//修改权限
+    	var id = $(_this).parent().parent().parent().parent().find('td:first').attr('id');
+    	$('#newUserDialog-ok-share').unbind('click').click(function(){
+		    var selectChangeNumber = $('#resPermission option:selected').val();
+    	    $.ajax({
+	            type:"post",
+	            dataType:"json",
+	            contentType:"application/x-www-form-urlencoded;charset=UTF-8",
+	            url:"{%url netPan.File.views.changeShareO%}",
+	            data:{
+	            	id:id,
+	            	selectChangeNumber: selectChangeNumber
+
+	            },
+	            success:function(data){
+	            	var message = data.message;
+	      			if(data.message=='T'){
+	            		showInfo('修改成功');
+	            	}else if(message == 'U'){
+			            showInfo('修改失败');
+			        }
+			        hideDialog();
+	            },
+	                  
+	        });
+    	});
+
+    }
+
+    function cancelShare(_this){	//取消分享
+    	var id = $(_this).parent().parent().parent().parent().find('td:first').attr('id');
+    	$('#CancelDialog-ok').click(function(){
+			$.ajax({
+	            type:"post",
+	            dataType:"json",
+	            contentType:"application/x-www-form-urlencoded;charset=UTF-8",
+	            url:"{%url netPan.File.views.cancelShare%}",
+	            data:{
+	            	id:id
+	            },
+	            success:function(data){
+	            	var message = data.message;
+	      			if(data.message=='V'){
+	            		showInfo('取消成功');
+	            	}else if(message == 'W'){
+			           	showInfo('取消失败');
+			        }
+			        hideDialog();
+			        window.location.reload();
+	            },
+	                      
+	        });
+		});
+
+    }
+		
+	function updateLists(){ //更新列表数据
+    	$.ajax({
+    		type:"post",
+	            dataType:"json",
+	            contentType:"application/x-www-form-urlencoded;charset=UTF-8",
+	            url:"{% url netPan.File.views.cancelShare%}",
+	            data:{},
+	            success:function(data){
+	            	var allFiles = JSON.parse(data.myfiles);
+	            	if(allFiles.length != 0){
+	            		showLists(allFiles);
+	            	}else{
+	            		$('tbody').html('无数据记录');
+	            	}
+		            	
+	            },
+	            error: function(xhr,textStatus,errorThrown){
+	            	
+	            }
+	            
+    	});
+
+    	function showLists(allFiles){
+	    		$('tbody').empty().append(
+	    				'<tr class="firstTr font-bold">' +
+							'<td width="8%"><input type="checkbox" id="selAll" onclick="selectAll();" />全选</td>' +
+							'<td>名称</td>' +
+							'<td>上传日期</td>' +
+							'<td>操作</td>' +
+				        '</tr>'
+				        );
+	    		for(var i=0; i<allFiles.length; i++){
+	    			var item = allFiles[i].fields;
+	    			var pk = allFiles[i].pk;
+	    			if(item.is_folder == 0){
+	    				$('tbody').append(
+		    				'<tr id='+ pk +' class="baseTr">' +
+								'<td><input type="checkbox" name="checkAll" id="checkAll" onclick="setSelectAll();"/></td>' +
+								'<td><input type="hidden" value='+ pk +' /><a class="hasLink" title="点击预览">'+item.name+'</a></td>' +
+								'<td>'+item.upload_time+'</td>' +
+								'<td>' +
+									'<ul>' +
+										
+										'<li><a rel="dialog" href="#shareDialog"><img title="分享" src="{{STATIC_URL}}img/png/fenxiang.png" /></a></li>' +
+										'<li><a rel="dialog" href="#deleteDialog"><img title="删除" src="{{STATIC_URL}}img/png/shanchu.png" /></a></li>' +
+									'</ul>' +
+								'</td>' +
+							'</tr>'
+		    			)
+
+	    			}else{
+	    				$('tbody').append(
+		    				'<tr id='+ pk +' class="baseTr">' +
+								'<td><input type="checkbox" name="checkAll" id="checkAll" onclick="setSelectAll();"/></td>' +
+								'<td><input type="hidden" value="B" />'+ item.name +'</td>' +
+								'<td>'+item.upload_time+'</td>' +
+								'<td>' +
+									'<ul>' +
+										'<li><a rel="dialog" href="#shareDialog"><img title="分享" src="{{STATIC_URL}}img/png/fenxiang.png" /></a></li>' +
+										'<li><a rel="dialog" href="#deleteDialog"><img title="删除" src="{{STATIC_URL}}img/png/shanchu.png" /></a></li>' +
+									'</ul>' +
+								'</td>' +
+							'</tr>'
+		    			)
+	    			}
+	    			
+
+	    		}
+
+	    		//必须写
+	    		$('#table').alterBgColor();
+	    		$("a[rel*=dialog]").leanModal({overlay:0.4, closeButton:".modal_close"}); //弹出框
+	    	}
+
+	}
+  
+
+</script>
+{% endblock %}

@@ -1,0 +1,83 @@
+#upload{
+	width:570px;
+}
+.conBaseBox{
+	display:none;
+	width:470px;
+	padding-bottom:15px;
+}
+.layerComment p button, .layerComment div button{
+	border:1px solid #3e8f3e; 
+	background-color:#5cb85c;
+	color:#fff;
+	text-align: center;
+	padding:5px;
+	width: 80px;
+    height:30px;  
+	float:right;
+}
+.layerComment p button:hover ,.layerComment div button:hover{
+	 border:1px solid #398439; 
+	 background-color: #47a447;
+	 cursor: pointer; 
+}
+.layerComment p button a, .layerComment div button a{
+	color:#fff;
+}
+
+.fontCenter p{
+	text-align:center;
+}
+#shareDialog-comment{
+	padding:20px 0px;
+}
+#userLists{
+	font-size:14px;
+	max-height:300px;
+	overflow-y:auto;
+	border:1px solid #e1e1e1;
+	padding:8px 15px 0px 15px;
+
+}
+#userLists ul li{
+	margin-bottom:8px;
+}
+.labelCss img, .labelCss input{
+	vertical-align:middle;
+}
+
+#resPermission1 select{
+	margin-top:12px;
+	margin-left:15px;
+	width:45%;
+}
+#resPermission2 select{
+	margin-top:15px;
+	margin-left:15px;
+	width:45%;
+}
+.shareUl{
+	padding:0px 15px;
+}
+.shareUl li{
+	width:60px;
+	text-align:center;
+	display:inline-block;
+	cursor:pointer;
+	margin-right:10px;
+	padding:3px;
+	/*background-color:#fff;*/
+	border-top: 1px solid #e1e1e1;
+	border-left: 1px solid #e1e1e1;
+	border-right: 1px solid #e1e1e1;
+}
+
+#shareBtn{
+	padding:0px 15px;
+}
+
+#preDialog{
+	width:500px;
+	height:auto;
+}
+.etabs{margin-left:15px;}

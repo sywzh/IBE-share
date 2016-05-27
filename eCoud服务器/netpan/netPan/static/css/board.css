@@ -1,0 +1,8 @@
+#board{                         /* 活动面板l*/
+  	height:420px;
+  }
+                   
+#board .top_nav{
+	height:50px;
+	background-color: #f9f9f7;
+}                                  

@@ -1,0 +1,49 @@
+{%extends "base.html"%}
+{% block title %}分享记录{% endblock %}
+
+{% block leftMenuShare %}
+	<li class="hover"><a href="{%url netPan.File.views.shareFile%}"><img src="{{STATIC_URL}}img/png/share.png">分享记录</a></li>
+{% endblock %}
+
+<!--二级功能展示区-->
+{% block topNavUl %}
+<link href="{{STATIC_URL}}css/share.css" rel="stylesheet" type="text/css" />
+<ul>
+	<!-- {%url netPan.File.views.shareOutFile %}    {%url netPan.File.views.shareInFile %}-->
+	<li class="topul_hover"><a href="{%url netPan.File.views.shareOutFile%}"><img src="{{STATIC_URL}}img/png/shareout.png"> 我的分享</a></li>
+	<li><a href="{%url netPan.File.views.shareInFile%}"><img src="{{STATIC_URL}}img/png/sharein.png"> 分享给我</a></li>
+</ul>
+{% endblock %}
+
+{%block showContent%}
+<div id="board_share">
+	<div class="table-c solide" >
+		<table id="table" width="100%" border="0" cellspacing="0" cellpadding="0" >
+			<tr class="firstTr font-bold">
+				<td width="8%"><input type="checkbox" id="selAll" onclick="selectAll();" />全选</td>
+				<td>名称</td>
+				<td>上传日期</td>
+				<td>操作</td>
+		    </tr>
+			<div class="table-comment"  id="allcheck">
+			<tr>
+				<td><input type="checkbox" name="checkAll" id="checkAll" onclick="setSelectAll();"/></td>
+				<td><input type="hidden" vvalue="B"></input>文学</td>
+				<td>file1</td>
+			</tr>
+			<tr>
+				<td><input type="checkbox" name="checkAll" id="checkAll" onclick="setSelectAll();"/></td>
+				<td><input type="hidden" vvalue="C"></input>计算机</td>
+				<td>file2</td>
+			</tr>
+		</table>
+	</div>
+</div>
+{% endblock %}
+
+{% block extracss %}
+<link href="{{STATIC_URL}}css/share.css" rel="stylesheet" type="text/css" />
+{% endblock %}
+
+{% block extrajs %}
+{% endblock %}

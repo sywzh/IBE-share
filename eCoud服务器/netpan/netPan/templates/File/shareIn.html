@@ -1,0 +1,71 @@
+{%extends "base.html"%}
+{% block title %}分享记录-分享给我{% endblock %}
+
+{% block leftMenuShare %}
+	<li class="hover"><a href="{%url netPan.File.views.shareFile%}"><img src="{{STATIC_URL}}img/png/share.png">分享记录</a></li>
+{% endblock %}
+
+<!--二级功能展示区-->
+{% block topNavUl %}
+<link href="{{STATIC_URL}}css/share.css" rel="stylesheet" type="text/css" />
+<ul>
+	<li ><a href="{%url netPan.File.views.shareOutFile %} "><img src="{{STATIC_URL}}img/png/shareout.png"> 我的分享</a></li>
+	<li class="topul_hover" onclick="updateLists();"><a href="{%url netPan.File.views.shareInFile%}"><img src="{{STATIC_URL}}img/png/sharein.png"> 分享给我</a></li>
+	<li ><a href="{%url netPan.File.views.myPubShare%}"><img src="{{STATIC_URL}}img/png/publicshare.png"> 我的共享</a></li>
+	<li><a href="{%url netPan.Log.views.shareLog%}"><img src="{{STATIC_URL}}img/png/log_info.png"> 历史记录</a></li>
+</ul>
+{% endblock %}
+
+{%block showContent%}
+<div id="board_share">
+	<div class="table-c solide" >
+		<table id="table" width="100%" border="0" cellspacing="0" cellpadding="0" >
+			<tr class="firstTr font-bold">
+				<td width="8%"><input type="checkbox" id="selAll" onclick="selectAll();" />全选</td>
+				<td>名称</td>
+				<td>分享日期</td>
+				<td>分享对象</td>
+				<td>操作</td>
+		    </tr>
+			<div class="table-comment"  id="allcheck">
+			{%for file in files%}
+			<tr id="{{file.id}}" class="baseTr">
+				<td><input type="checkbox" name="checkAll" id="checkAll" onclick="setSelectAll();"/></td>
+				<td><img class="img-css" src="{{STATIC_URL}}img/png/file.png" />{{file.file.name}}</td>
+				<td>{{file.time}}</td>
+				<td>{{file.who_share}}</td>
+				<!-- if(XXX) 可下载-->
+				<td>
+				   {%if file.is_download == '1'%}
+					<ul>
+						<li><a rel="dialog" href="#shareDialog"><img title="编辑" src="{{STATIC_URL}}img/png/chuli.png" /></a></li>
+						<li><a href="{% url netPan.File.views.shareDownload file.id%}"><img title="下载" src="{{STATIC_URL}}img/png/xiazai.png" /></a></li>
+					</ul>
+					{%endif%}
+						<!-- //if(XXXXXX) -->
+					{%if file.is_edit == '1'%}
+					<ul>
+					   <li><a rel="dialog" href="#shareDialog"><img title="编辑" src="{{STATIC_URL}}img/png/chuli.png" /></a></li>
+					</ul>
+					{%endif%}
+					<!-- //if(XXXXXXXXXXXX) -->
+				</td>
+
+				
+			</tr>
+			{%endfor%}	
+		</div> 
+		</table>
+	</div>
+</div>
+{% endblock %}
+
+{% block extracss %}
+<link href="{{STATIC_URL}}css/share.css" rel="stylesheet" type="text/css" />
+{% endblock %}
+
+{% block extrajs %}
+
+
+</script>
+{% endblock %}

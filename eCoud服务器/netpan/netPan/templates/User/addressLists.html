@@ -1,0 +1,338 @@
+{%extends "base.html"%}
+{% block title %}通讯录{% endblock %}
+
+{% block leftMenuAddressLists %}
+	<li class="hover"><a href="{%url netPan.User.views.viewAddList%}"><img src="{{STATIC_URL}}img/png/address.png">通讯录</a></li>
+{% endblock %}
+
+<!--二级功能展示区-->
+{% block topNavUl %}
+<link href="{{STATIC_URL}}css/share.css" rel="stylesheet" type="text/css" />
+<ul>
+	<li><a href="#newUserDialog" rel="dialog" onclick="clearOldsInfo();"><img src="{{STATIC_URL}}img/png/user-add.png"> &nbsp;添加联系人</a></li>
+</ul>
+{% endblock %}
+
+{%block showContent%}
+<div id="board_share">
+	<div class="table-c solide" >
+		<table id="table" width="100%" border="0" cellspacing="0" cellpadding="0" >
+			<tr class="firstTr font-bold">
+				<td>姓名</td>
+				<td>邮箱</td>
+				<td>备注</td>
+				<td>操作</td>
+		    </tr>
+			<div class="table-comment" id="allcheck">
+			{%for req in users%}
+			<tr>
+				<td class="nameTd">{{req.username}}</td>
+				<td class="addressTd">{{req.email}}</td>
+				<td class="remarkTd">{{req.remarks}}</td>
+				<td>
+					<ul id="{{req.id}}">
+						<li><a rel="dialog" onclick="showEditDialog(this)" href="#">编辑<input type="hidden" value="{{req.email}}" /></a></li>
+						<li><a rel="dialog" onclick="showDeleteDialog(this)" href="#">删除</a></li>
+					</ul>
+				</td>
+			</tr>
+			{%endfor%}
+		</table>
+	</div>
+</div>
+{% endblock %}
+
+{% block addOperate %}
+<!--添加联系人-->
+<div id="newUserDialog" class="conBaseBox">
+	<div id="newUserDialog-header" class="conBoxHeader">
+		<span class="layerTop">添加联系人</span>
+		<a class="modal_close" href="#" title="关闭"></a>
+	</div>
+	<div class="conBoxContent">
+		<div id="newUserDialog-comment" class="layerComment fontCenter">
+			<form>
+				<p id="remark-info" class="colorRed"></p>
+				<p>
+					<label>邮箱(必填) </label>
+					<input id="address" type="text"></input>
+					<label class="mt10">备注</label>
+					<input id="remark" type="text"></input>
+					
+				</p>
+		    </form>
+			<div class="margin-top20">
+				<button id="newUserDialog-cancel" onclick="hideDialog();" class="layerBootom">取消</button>
+				<button id="newUserDialog-ok" onclick="addNewPer();" class="layerBootom margin-right10">提交</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!--编辑-->
+<div id="editDialog" class="conBaseBox">
+	<div id="editDialog-header" class="conBoxHeader">
+		<span class="layerTop">编 辑</span>
+		<a class="modal_close" href="#" title="关闭"></a>
+	</div>
+	<div class="conBoxContent">
+		<div id="editDialog-comment" class="layerComment fontCenter">
+			<form>
+				<p id="editRemark-info" class="colorRed"></p>
+				<p>
+					<label>邮箱(必填) </label>
+					<input id="editAddress" type="text" title="只读" readonly="readonly"></input>
+					<label class="mt10">备注</label>
+					<input id="editRemark" type="text"></input>
+					
+				</p>
+		    </form>
+			<div class="margin-top20">
+				<button id="editDialog-cancel" onclick="hideDialog();" class="layerBootom">取消</button>
+				<button id="editDialog-ok" class="layerBootom margin-right10">提交</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!--删除-->
+<div id="deleteDialog" class="conBaseBox">
+	<div id="deleteDialog-header" class="conBoxHeader">
+		<span class="layerTop">删 除</span>
+		<a class="modal_close" href="#" title="关闭"></a>
+	</div>
+	<div class="conBoxContent">
+		<div id="deleteDialog-comment" class="layerComment fontCenter">
+			<p>你确定删除联系人 <span id="cancelUser"></span> 吗？</p>
+			<div class="margin-top20">
+				<button id="deleteDialog-cancel" onclick="hideDialog();" class="layerBootom">取消</button>
+				<button id="deleteDialog-ok" class="layerBootom margin-right10">提交</button>
+			</div>
+		</div>
+	</div>
+</div>
+{% endblock %}
+
+{% block extracss %}
+<style type="text/css">
+     .colorRed{color:red;font-size:14px;padding-bottom:6px;}
+</style>
+<link href="{{STATIC_URL}}css/addressLists.css" rel="stylesheet" type="text/css" />
+
+{% endblock %}
+
+{% block extrajs %}
+	<script type="text/javascript">
+	    $(document).ready(function(){
+	    	
+	    })
+
+	    function clearOldsInfo(){
+
+	    	//清空错误提示
+	    	$('#remark-info').text('');
+	    	$('#address').attr('value','');
+	    	$('#remark').attr('value','');
+	    }
+
+	    function addNewPer(){ //添加联系人
+
+	    	var address = $('#address').val();
+	    	var remark = $('#remark').val();
+	    	if(address == ""){
+	    		$('#remark-info').text("请输入邮箱");
+	    		return false;
+	    	}
+	    	$.ajax({
+	            type:"post",
+	            dataType:"json",
+	            contentType:"application/x-www-form-urlencoded;charset=UTF-8",
+	            url:"{% url netPan.User.views.addList%}",
+	            data:{
+	            	address: address,
+	            	remark: remark
+	            },
+	            success:function(data){
+	            	var message = data.message;
+	            	if(message == 'N'){
+	            		$('#remark-info').text('不存在此联系人，请通知联系人注册');
+	            	}else if(message == 'O'){
+	            		showInfo('添加成功');
+	            		hideDialog();
+	            		updateLists();
+	            	}else if(message == 'P'){
+	            		$('#remark-info').text('备注字数不超过25个字');
+	            	}else if(message == 'U'){
+	            		$('#remark-info').text('联系人已添加');
+	            	}
+	            	
+	            },
+	            error: function(xhr,textStatus,errorThrown){
+	            	
+	            }
+	            
+	        });
+	     }
+
+	    function updateLists(){  //更新数据
+	     	$.ajax({
+	            type:"post",
+	            dataType:"json",
+	            contentType:"application/x-www-form-urlencoded;charset=UTF-8",
+	            url:"{% url netPan.User.views.viewLists%}",  
+	            data:{},
+	            success:function(data){
+	            	var allLists = JSON.parse(data.all_lists);
+	            	if(allLists.length > 0){
+	            		showLists(allLists);
+	            	}else{
+	            		$('tbody').empty().append(
+	    				'<tr class="firstTr font-bold">' +
+	    				    '<td>姓名</td>' +
+							'<td>邮箱</td>' +
+							'<td>备注</td>' +
+							'<td>操作</td>' +
+					    '</tr>'+
+					    '<tr class="firstTr">' +
+							'<td>暂无数据记录</td>' +
+							'<td></td>' +
+							'<td></td>' +
+							'<td></td>' +
+					    '</tr>'
+				        );
+	            	}
+	            	
+	            	
+	            },
+	            error: function(xhr,textStatus,errorThrown){
+	            	
+	            }
+	            
+	        });
+	     }
+
+	     function showLists(allLists){
+	    		$('tbody').empty().append(
+	    				'<tr class="firstTr font-bold">' +
+							'<td>姓名</td>' +
+							'<td>邮箱</td>' +
+							'<td>备注</td>' +
+							'<td>操作</td>' +
+					    '</tr>'
+				        );
+	    		for(var i=0; i<allLists.length; i++){
+	    			var name = allLists[i].fields.username;
+	    			var email = allLists[i].fields.email;
+	    			var remark = allLists[i].fields.remarks;
+	    			var id = allLists[i].pk;
+	    			$('tbody').append(
+	    				'<tr>'+
+							'<td class="nameTd">'+ name +'</td>'+
+							'<td class="addressTd">'+ email +'</td>'+
+							'<td class="remarkTd">'+ remark +'</td>'+
+							'<td>'+
+								'<ul id='+ id +'>'+
+									'<li><a rel="dialog" onclick="showEditDialog(this)" href="#">编辑<input type="hidden" value='+ email +' /></a></li>'+
+									'<li><a rel="dialog" onclick="showDeleteDialog(this)" href="#">删除</a></li>'+
+								'</ul>'+
+							'</td>'+
+						'</tr>'
+	    			);
+
+	    		}
+
+	    		//必须写
+	    		$('#table').alterBgColor();
+	    		$("a[rel*=dialog]").leanModal({overlay:0.4, closeButton:".modal_close"}); //弹出框
+	    	}
+
+	    function showEditDialog(_this){  //控制编辑框
+
+	    	//清空错误提示
+	    	$('#editRemark-info').text('');
+	    	//获得当前选项的邮箱
+	    	var getAddress = $(_this).find('input:hidden').attr('value');
+	    	var getRemark = $(_this).parent().parent().parent().parent().find('td.remarkTd').text();
+	    	var id = $(_this).parent().parent().attr('id');
+	    	$('#editAddress').attr('value',getAddress);
+	    	$('#editRemark').attr('value',getRemark);
+	    	$(_this).attr("href","#editDialog");
+	    	$('#editDialog-ok').unbind('click').bind('click', function(){
+	    		editUser(id);
+	    	});
+	    }
+
+	    function editUser(id){ //编辑
+	    	var remark = $('#editRemark').val();
+	    	if(remark.length > 25){
+	    		$('#editRemark-info').text('输入长度要求不大于25个字符');
+	    		return false;
+	    	}
+	    	$.ajax({
+	            type:"post",
+	            dataType:"json",
+	            contentType:"application/x-www-form-urlencoded;charset=UTF-8",
+	            url:"{% url netPan.User.views.modifyList%}",
+	            data:{
+	            	id: id,
+	            	remark: remark
+	            },
+	            success:function(data){
+	            	var message = data.message;
+	                if(message == 'V'){
+	            		showInfo('修改成功');
+	            		hideDialog();
+	            		updateLists();
+	            	}else if(message == 'W'){
+	            		$('#editRemark-info').text('修改失败,请重填');
+	            	}else if(message == 'P'){
+	            		$('#editRemark-info').text('备注字数要求不超过25个字');
+	            	}
+	            },
+	            error: function(xhr,textStatus,errorThrown){
+	            	
+	            }
+	            
+	        });
+	    }
+
+	    function showDeleteDialog(_this){
+	    	var id = $(_this).parent().parent().attr('id');
+	    	var name = $(_this).parent().parent().parent().parent().find('td.nameTd').text();
+	    	$(_this).attr("href","#deleteDialog");
+	    	$('#cancelUser').text(name);
+	    	$('#deleteDialog-ok').unbind('click').bind('click', function(){
+	    		deleteUser(id);
+	    	});
+	    }
+
+	    function deleteUser(id){ //删除
+	    	$.ajax({
+	            type:"post",
+	            dataType:"json",
+	            contentType:"application/x-www-form-urlencoded;charset=UTF-8",
+	            url:"{% url netPan.User.views.delList%}",
+	            data:{
+	            	id: id
+	            },
+	            success:function(data){
+	            	var message = data.message;
+	            	if(message == 'S'){
+	            		showInfo('删除添加联系人成功');
+	            		hideDialog();
+	            		updateLists();
+	            	}else if(message == 'T'){
+	            		showInfo('删除添加联系人失败');
+	            	}
+	            	
+	            },
+	            error: function(xhr,textStatus,errorThrown){
+	            	
+	            }
+	            
+	        });
+	    }
+	</script>
+
+ }
+{% endblock %}

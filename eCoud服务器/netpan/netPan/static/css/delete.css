@@ -1,0 +1,27 @@
+.conBaseBox{
+	display:none;
+	width:470px;
+	padding-bottom:15px;
+}
+.layerComment p button{
+	border:1px solid #3e8f3e; 
+	background-color:#5cb85c;
+	color:#fff;
+	text-align: center;
+	padding:5px;
+	width: 80px;
+    height:30px;  
+	float:right;
+}
+.layerComment p button:hover {
+	 border:1px solid #398439; 
+	 background-color: #47a447;
+	 cursor: pointer; 
+}
+.layerComment p button a{
+	color:#fff;
+}
+
+.fontCenter p{
+	text-align:center;
+}

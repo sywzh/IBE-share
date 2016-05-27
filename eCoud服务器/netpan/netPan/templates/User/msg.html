@@ -1,0 +1,357 @@
+{%extends "base.html"%}
+{% block title %}消息中心{% endblock %}
+
+<!--二级功能展示区-->
+{% block topNavUl %}
+    <ul id="resetCss">
+		<li><a value="1" onclick="">未 读</a></li>
+		<li><a value="0" onclick="">已 读 </a></li>
+	</ul>
+	<button id="sendMsg-option" type="text" onclick="sendMsgOperation();">发送消息</button>
+{% endblock %}
+<!--数据显示区-->
+{% block showContent %}
+	<div id="msg-container">
+		<div class="table-c solide">
+			<table id="table" width="100%" border="0" cellspacing="0" cellpadding="0" >
+				<tr class="firstTr font-bold">
+					
+			    </tr>
+				<div class="table-comment"  id="allcheck">
+					<tr onclick="showMsgDialog();">
+						<td>
+							<span class="img-css"><img src="{{STATIC_URL}}img/png/email.png" /></span>
+							<span>userName11</span>
+						</td>
+						<td>123456@qq.com</td>
+						<td>2014-5-15 15:43</td>
+					</tr>
+					<tr onclick="showMsgDialog();">
+						<td>
+							<span class="img-css"><img src="{{STATIC_URL}}img/png/email.png" /></span>
+							<span>userName1133</span>
+						</td>
+						<td>2412456@qq.com</td>
+						<td>2014-5-15 19:43</td>
+					</tr>
+				</div>
+			</table>
+
+			<div id="msgDialog-container">
+				<div id="msgDialog-header">
+					<span id="msgDialog-info">正在与“小明”通信</span>
+					<span id="msg-close" onclick="closeMsgDialog();">X</span>
+				</div>
+				<div id="msgDialog-content">
+					<div class="msg-content-container">
+						<div>
+							<img class="img-position" src="{{STATIC_URL}}img/png/user.png" />
+						</div>
+					    <div>
+					    	<div>
+								<span class="fromer">小明</span>
+								<span class="current-time">13:45</span>
+							</div>
+							<p>hekjwksgwegwegejflsjcksjclksjcslkjcdkvkdvl<br/>
+								kdjkfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhddgdgdgdgdhdfhfd</p>
+						</div>
+					</div>
+					<div class="msg-content-container">
+						<div>
+							<img class="img-position" src="{{STATIC_URL}}img/png/user.png" />
+						</div>
+					    <div>
+					    	<div>
+								<span class="fromer">me</span>
+								<span class="current-time">13:56</span>
+							</div>
+							<p>hekjwksgwegwegejflsjcksjclksjcsldsgsgjkd</p>
+						</div>
+					</div>
+				</div>
+				<div id="msgDialog-footer" class="layerBootom">
+					<input id="input-msg" type="text"></input>
+					<button type="text" onclick="send('msgDialog-content','input-msg');">发 送</button>
+				</div>
+			</div>
+
+
+         <!-- sendMsg -->
+         <div id="menu-send-btn">
+         	<!-- userLists -->
+         	<div id="userLists-container">
+         		<div class="header-info">
+         			<span>联系人名单</span>
+         	    </div>
+         	    <div class="main-content">
+         	    	<div class="ueserList" onclick="showUserDialog();">
+	         	    	<img src="{{STATIC_URL}}img/png/user.png"/>
+	         	    	<span>xiaoming</span>
+	         	    	<span>1234567@qq.com</span>
+	         	    </div>
+	         	    <div class="ueserList">
+	         	    	<img src="{{STATIC_URL}}img/png/user.png"/>
+	         	    	<span>wanglin</span>
+	         	    	<span>1234567@qq.com</span>
+	         	    </div>
+         	    </div>
+         	</div>
+         	<!-- sendMsgDialog -->
+			<div id="sendmsg-container">
+				<div id="first-container">
+					<span id="userLists-info">正在与“小明”通信</span>
+					
+				</div>
+				<div id="sendmsg-content">
+					<div class="msg-content-container">
+						<div>
+							<img class="img-position" src="{{STATIC_URL}}img/png/user.png" />
+						</div>
+					    <div>
+					    	<div>
+								<span class="fromer">小明</span>
+								<span class="current-time">13:45</span>
+							</div>
+							<p>hekjwksgwegwegejflsjcksjclksjcslkjcdkvkdvl<br/>
+								kdjkfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhfhddgdgdgdgdhdfhfd</p>
+						</div>
+					</div>
+					<div class="msg-content-container">
+						<div>
+							<img class="img-position" src="{{STATIC_URL}}img/png/user.png" />
+						</div>
+					    <div>
+					    	<div>
+								<span class="fromer">me</span>
+								<span class="current-time">13:56</span>
+							</div>
+							<p>hekjwksgwegwegejflsjcksjclksjcsldsgsgjkd</p>
+						</div>
+					</div>
+				</div>
+				<div id="sendmsg-footer" class="layerBootom">
+					<input id="send-input-msg" type="text"></input>
+					<button type="text" onclick="send('sendmsg-content','send-input-msg');">发 送</button>
+				</div>
+			</div>
+		</div>
+
+     </div>
+</div>
+
+
+{% endblock %}
+
+{% block extracss %}
+<link href="{{STATIC_URL}}css/msg.css" rel="stylesheet" type="text/css" />
+{% endblock %}
+
+{% block extrajs %}
+
+<script type="text/javascript">
+		var socket;
+		function connect(message,headerInfo){
+			socket = new io.Socket();
+			socket.connect();
+		    var message = $('#'+message);
+		    var headerInfo = $('#'+headerInfo);
+		    socket.on('message',function(data){
+		    	var userName = 'test';
+		   		var time = '123';
+		   		var msgs = 'zczcxc';
+		   		headerInfo.html('正在与"'+ userName +'"通信');
+		   		message.append(
+		   			'<div class="msg-content-container">' +
+						'<div>' +
+							'<img class="img-position" src="{{STATIC_URL}}img/png/user.png" />' +
+						'</div>' +
+					    '<div>' +
+					    	'<div>' +
+								'<span class="fromer">'+ userName +'</span>' +
+								'<span class="current-time">'+ time +'</span>' +
+							'</div>' +
+							'<p>'+ msgs +'</p>' +
+						'</div>' +
+					'</div>'
+		   		);
+
+		    });
+	   		
+		}
+
+		function send(message,inputText){
+			var text = $('#input-msg').value(); 
+			var message = $('#'+message);
+			var data;
+			if(text){
+			   data = {room:1, message: text};
+
+			}
+			socket.send(data);
+
+			$('#'+inputText).val('').focus() ;
+		}
+		
+		function disconnect(){
+			
+		}
+
+
+		function showMsgDialog(){  //展示对话框
+			connect('msgDialog-content','msgDialog-info');
+			$('#msgDialog-container').animate({
+				height: 'show'
+			},600);
+		}
+
+		function closeMsgDialog(){  //隐藏对话框
+			disconnect();
+			$('#msgDialog-container').animate({
+				height: 'hide'
+			},600);
+		}
+
+		function sendMsgOperation(){  //
+			$('#table').hide();
+			$('#menu-send-btn').show();
+		}
+
+		function showUserDialog(){
+			connect('sendmsg-content','userLists-info');
+			$('#sendmsg-container').animate({
+				height: 'show'
+			},600);
+		}
+
+		function closeUserDialog(){  //隐藏对话框
+			disconnect();
+			$('#sendmsg-container').animate({
+				height: 'hide'
+			},600);
+		}
+
+</script>
+
+
+<!-- <script type="text/javascript">
+		var webSocket;
+		var sender = new Object();
+		function connect(message,headerInfo){
+			try{
+				   var readyState = new Array("正在建立连接","已建立连接","正在关闭连接","已关闭连接");
+				   var host = "";
+				   webSocket = new WebSocket(host);
+				   var message = $('#'+message);
+				   var headerInfo = $('#'+headerInfo);
+				   webSocket.onopen = function(event){
+				   	    if(webSocket.readyState == 1){   //连接成功发送当前用户名给server
+				   	    	var userName //= sender.userName
+				   	    	webSocket.send(userName);
+				   	    }
+				   }
+
+				   webSocket.onmessage = function(event){   //接收服务端数据
+				   		var recData = JSON.parse(event.data);
+				   		var userName ;
+				   		var time ;
+				   		var msgs ;
+				   		headerInfo.html('正在与"'+ userName +'"通信');
+				   		message.append(
+				   			'<div class="msg-content-container">' +
+								'<div>' +
+									'<img class="img-position" src="{{STATIC_URL}}img/png/user.png" />' +
+								'</div>' +
+							    '<div>' +
+							    	'<div>' +
+										'<span class="fromer">'+ userName +'</span>' +
+										'<span class="current-time">'+ time +'</span>' +
+									'</div>' +
+									'<p>'+ msgs +'</p>' +
+								'</div>' +
+							'</div>'
+				   		);
+				   }
+
+				   webSocket.onclose = function(){
+
+				   }
+			}
+			catch(exception){
+				$('#'+message).html('连接异常');
+			}
+		}
+
+		function send(message,inputText){
+			var text = $('#input-msg').value();
+			var message = $('#'+message);
+			if(text == ""){
+
+			}
+			try{
+				webSocket.send(JSON.stringfy({
+				}));
+			}
+			catch(exception){
+				message.append('<p> 发送数据出错 </p>');
+			}
+			$('#'+inputText).value = "" ;
+		}
+		
+		function disconnect(){
+			webSocket.close();
+		}
+
+		function showMsgDialog(){  //展示对话框
+			connect('msgDialog-content','msgDialog-info');
+			$('#msgDialog-container').animate({
+				height: 'show'
+			},600);
+		}
+
+		function closeMsgDialog(){  //隐藏对话框
+			disconnect();
+			$('#msgDialog-container').animate({
+				height: 'hide'
+			},600);
+		}
+
+		function getMsgs(_this){   //更新数据
+			var flag = $(_this).value();
+			$.ajax({
+	            type:"post",
+	            dataType:"json",
+	            contentType:"application/x-www-form-urlencoded;charset=UTF-8",
+	            url:"",
+	            data:{
+	            	flag: flag  //1：未读, 0：已读
+	            },
+	            success:function(data){
+	            	
+	            	
+	            },
+	            error: function(xhr,textStatus,errorThrown){	            	
+	            }	            
+	        });
+		}
+
+		function sendMsgOperation(){ //
+			$('#table').hide();
+			$('#menu-send-btn').show();
+		}
+
+		function showUserDialog(){
+			connect('sendmsg-content','userLists-info');
+			$('#sendmsg-container').animate({
+				height: 'show'
+			},600);
+		}
+
+		function closeUserDialog(){  //隐藏对话框
+			disconnect();
+			$('#sendmsg-container').animate({
+				height: 'hide'
+			},600);
+		}
+
+</script> -->
+{% endblock %}

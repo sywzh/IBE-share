@@ -1,0 +1,167 @@
+.img-css img{
+	vertical-align:middle;
+}
+
+td span{
+	margin-left:12px;
+}
+
+#resetCss{
+	width:auto;
+}
+#sendMsg-option{
+	display:inline-block;
+	margin-left:35px;
+	margin-top:12px;
+	border: 1px solid #3e8f3e;
+	background-color: #5cb85c;
+	color: #fff;
+	padding:2px 5px;
+}
+#sendMsg-option:hover{
+	border: 1px solid #398439;
+	background-color: #47a447;
+	cursor: pointer;
+}
+
+/*msgDialog*/
+#msgDialog-container{
+	display:none;
+	-webkit-box-shadow: 0 0px 15px rgba(0, 0, 0, 0.10);
+    box-shadow: 0 0px 15px rgba(0, 0, 0, 0.10);
+	border: 1px solid #e1e1e1;
+	margin: 15px 10px 15px 215px;
+	background-color: #fbfbfb;
+	width:520px;
+	height:82%;
+	position:absolute;
+	bottom:3%;
+	right:0%;
+}
+
+#msgDialog-header{
+	border-bottom: 1px solid #e1e1e1;
+	height:10%;
+}
+#msgDialog-header span{
+	display:inline-block;
+	font-size:16px;
+	font-weight:bold;
+}
+#userLists-info, #msgDialog-info{
+	color:#E84313;
+	margin-left:15px;
+	margin-top:15px;
+}
+#msg-close{
+	float:right;
+	margin-right:15px;
+	margin-top:15px;
+	color:#e1e1e1;
+}
+#msg-close:hover{
+	color:#c1c1c1;
+	cursor:pointer;
+}
+#sendmsg-content, #msgDialog-content{
+	height:78%;
+	overflow-y:auto;
+	overflow-x:hidden;
+	padding:5px 15px;
+}
+#sendmsg-footer,#msgDialog-footer{
+	border-top: 1px solid #e1e1e1;
+	height:12%;
+}
+#sendmsg-footer input, #msgDialog-footer input{
+	margin-top:10px;
+	margin-left:15px;
+    height:42%;
+	width:78%;
+}
+#sendmsg-footer button, #msgDialog-footer button{
+	margin-top:11px;
+	border: 1px solid #3e8f3e;
+	background-color: #5cb85c;
+	color: #fff;
+	font-size:16px;
+	font-weight:bold;
+}
+#sendmsg-content div, #msgDialog-content div{
+	margin-bottom:8px;
+	padding-bottom:10px;
+}
+span.current-time{
+	display:inline-block;
+	float:right;
+}
+img.img-position{
+	vertical-align:middle;
+}
+.msg-content-container{
+	border-bottom: 1px solid #e1e1e1;
+}
+.msg-content-container div{
+	display:inline;
+}
+.msg-content-container div p{
+	padding-left: 24px;
+	padding-right:15px;
+}
+
+/*sendMsg UI*/
+#sendmsg-container{
+	float:right;
+	border: 1px solid #e1e1e1;
+	width:60%;
+	height:470px;
+	margin:10px;
+	display:none;
+}
+
+#first-container{
+	border-bottom: 1px solid #e1e1e1;
+	height:10%;
+}
+
+#first-container div{
+    display:inline-block;
+}
+
+#sendmsg-header{
+	height:80%;
+	width:65%;
+}
+#sendmsg-header input{
+	margin-top:8px;
+	height:80%;
+	width:100%;
+}
+
+/*userLists*/
+#userLists-container{
+	border: 1px solid #e1e1e1;
+	float:left;
+	width:25%;
+	margin:10px;
+	max-height:470px;
+	overflow-y:auto;
+}
+.header-info {
+	padding:5px;
+	border-bottom:1px solid #e1e1e1;
+}
+.ueserList{
+	padding:10px 5px;
+	border-bottom:1px solid #e1e1e1;
+	cursor:pointer;
+}
+.ueserList:hover{
+	background-color:#f9f9f7;
+}
+.ueserList img{
+	vertical-align:middle;
+}
+#menu-send-btn{
+	display:none;
+}

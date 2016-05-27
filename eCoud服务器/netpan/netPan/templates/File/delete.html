@@ -1,0 +1,468 @@
+{%extends "base.html"%}
+{% block title %}误删恢复{% endblock %}
+
+{% block leftMenuDelete %}
+	<li class="hover"><a href="{%url netPan.File.views.deleteFile%}"><img src="{{STATIC_URL}}img/png/huifu.png">误删恢复</a></li>
+{% endblock %}
+<!--二级功能展示区-->
+
+{% block topNavUl %}
+<ul>
+	<li><a href="#rebackDialog" rel="dialog" onclick="rebackFile();"><img src="{{STATIC_URL}}img/png/big-in.png" /> &nbsp;恢复</a></li>
+	<li><a href="#comDeleteDialog" rel="dialog" onclick="comDeleteFile();"><img src="{{STATIC_URL}}img/png/clean2.png" /> &nbsp;彻底删除</a></li>
+	<li><a href="#" onclick="showDeleteLogs();">
+		<img src="{{STATIC_URL}}img/png/log_info.png"> &nbsp;历史记录</a>
+	</li>
+</ul>
+{% endblock %}
+<!--数据显示区-->
+{% block showContent %}
+	<div id="board_delete">
+			<div class="table-c solide" >
+				<table id="table" width="100%" border="0" cellspacing="0" cellpadding="0" >
+					<tr class="firstTr font-bold">
+						<td width="8%"><input type="checkbox" id="selAll" onclick="selectAll();" />全选</td>
+						<td>名称</td>
+						<td>上传日期</td>
+						<td>操作</td>
+				    </tr>
+					<div class="table-comment"  id="allcheck">
+						{%for file in files%}
+						<tr id="{{file.id}}" class="baseTr">
+							<td><input type="checkbox" name="checkAll" id="checkAll" onclick="setSelectAll();"/></td>
+							{%if file.is_folder == '0'%}
+							<td><img class="img-css" src="{{STATIC_URL}}img/png/file.png" />{{file.name}}</td>
+							{%else%}
+							<td><img class="img-css" src="{{STATIC_URL}}img/png/folder.png" />{{file.name}}</td>
+							{%endif%}
+							<td>{{file.upload_time}}</td>
+
+							<td>
+								<ul>
+									<li><a href="#rebackDialog" rel="dialog" onclick="rebackSingleFile(this)"><img title="恢复" src="{{STATIC_URL}}img/png/small-in.png" /></a></li>
+									<li><a href="#comDeleteDialog" rel="dialog" onclick="comDeleteSingleFile(this)"><img title="彻底删除" src="{{STATIC_URL}}img/png/clean.png" /></a></li>
+								</ul>
+							</td>
+						</tr>
+						{%endfor%}				
+					</div>
+				</table>
+			</div>
+		</div>
+{% endblock %}
+
+{% block addOperate %}
+<!--恢复文件-->
+<div id="rebackDialog" class="conBaseBox">
+	<div id="rebackDialog-header" class="conBoxHeader">
+		<span class="layerTop">恢复文件（夹）</span>
+		<a class="modal_close" href="#" title="关闭"></a>
+	</div>
+	<div class="conBoxContent">
+		<div id="rebackDialog-comment" class="layerComment fontCenter">
+			<p>您确定要恢复删除的文件（夹）吗？</p>
+		    <p>( 恢复的文件（夹）可在“我的网盘”下查看 )</p>
+			<p class="margin-top20">
+				<button id="rebackDialog-cancel" onclick="hideDialog();" class="layerBootom">取消</button>
+				<button id="rebackDialog-ok" class="layerBootom margin-right10">确定</button>
+			</p>
+		</div>
+	</div>
+</div>
+
+<!--彻底删除文件-->
+<div id="comDeleteDialog" class="conBaseBox">
+	<div id="comDeleteDialog-header" class="conBoxHeader">
+		<span class="layerTop">删 除</span>
+		<a class="modal_close" href="#" title="关闭"></a>
+	</div>
+	<div class="conBoxContent">
+		<div id="comDeleteDialog-comment" class="layerComment fontCenter">
+		    <p>彻底删除的文件将不会复原,</p>
+		    <p>您确定要把文件彻底删除吗？</p>
+			<p class="margin-top20">
+				<button id="comDeleteDialog-cancel" onclick="hideDialog();" class="layerBootom">取消</button>
+				<button id="comDeleteDialog-ok" class="layerBootom margin-right10">确定</button>
+			</p>
+		</div>
+	</div>
+</div>
+{% endblock %}
+
+{% block extracss %}
+<link href="{{STATIC_URL}}css/delete.css" rel="stylesheet" type="text/css" />
+{% endblock %}
+
+{% block extrajs %}
+<script type="text/javascript">
+        $(document).ready(function(){
+        	
+        });
+
+        function rebackFile(){ //批量误删恢复
+	    	var allitems = $('tbody tr:not(.firstTr):has(:checked)');
+	    	var itemsLength = allitems.length;
+	    	if(itemsLength > 0) {
+	    		var fileId = new Array();
+	    		for(var i=0; i<itemsLength; i++){  //可批量删除
+	    			fileId.push($(allitems[i]).attr('id'));
+	    		}
+
+	    		$('#rebackDialog-comment').html(
+	    			'<p>您确定要恢复删除的文件（夹）吗？</p>' +
+				    '<p>( 恢复的文件（夹）可在“我的网盘”下查看 )</p>' +
+					'<p class="margin-top20">' +
+						'<button id="rebackDialog-cancel" onclick="hideDialog();" class="layerBootom">取消</button>' +
+						'<button id="rebackDialog-ok" class="layerBootom margin-right10">确定</button>' +
+					'</p>'
+	    			);
+
+	    		$('#rebackDialog-ok').unbind('click').click(function(){
+	    			sendData(fileId,function(){
+		    			updateLists();
+		    		});
+		    		hideDialog();
+	    		});
+	    		
+	    	}else{
+	    		$('#rebackDialog-comment').html('<p>请先选择要处理的文件！</p>');
+	    	}   	
+	    	
+	    	function sendData(fileId,callback){  
+		    		$.ajax({
+			            type:"post",
+			            dataType:"json",
+			            contentType:"application/x-www-form-urlencoded;charset=UTF-8",
+			            url:"{% url netPan.File.views.resumeFile%}",
+			            data:{
+			            	id: JSON.stringify(fileId)
+			            },
+			            success:function(data){
+			            	var message = data.message;
+			            	if(message == 'H'){
+			            		showInfo('文件恢复成功');
+			            		if(callback){
+			            			callback();
+			            		}
+			            	}else if(message == 'I'){
+			            		showInfo('文件恢复失败');
+			            	}
+			            },
+			            error: function(xhr,textStatus,errorThrown){
+			            	
+			            }
+			            
+			        });
+	         }
+
+	    }
+
+	    function rebackSingleFile(_this){ //单个误删恢复
+	    	var id=$(_this).parent().parent().parent().parent().attr('id');
+	    	var fileId = new Array();
+	    	fileId.push(id);
+
+	    	$('#rebackDialog-comment').html(
+	    			'<p>您确定要恢复删除的文件（夹）吗？</p>' +
+				    '<p>( 恢复的文件（夹）可在“我的网盘”下查看 )</p>' +
+					'<p class="margin-top20">' +
+						'<button id="rebackDialog-cancel" onclick="hideDialog();" class="layerBootom">取消</button>' +
+						'<button id="rebackDialog-ok" class="layerBootom margin-right10">确定</button>' +
+					'</p>'
+	    			);
+
+	    	$('#rebackDialog-ok').unbind('click').click(function(){
+	    			sendData(fileId,function(){
+		    			updateLists();
+		    		});
+		    		hideDialog();
+	    		});
+	    		
+	    	function sendData(fileId,callback){  
+		    		$.ajax({
+			            type:"post",
+			            dataType:"json",
+			            contentType:"application/x-www-form-urlencoded;charset=UTF-8",
+			            url:"{% url netPan.File.views.resumeFile%}",
+			            data:{
+			            	id: JSON.stringify(fileId)
+			            },
+			            success:function(data){
+			            	var message = data.message;
+			            	if(message == 'H'){
+			            		showInfo('文件恢复成功');
+			            		if(callback){
+			            			callback();
+			            		}
+			            	}else if(message == 'I'){
+			            		showInfo('文件恢复失败');
+			            	}
+			            },
+			            error: function(xhr,textStatus,errorThrown){
+			            	
+			            }
+			            
+			        });
+	         }
+
+	    }
+
+	    function comDeleteFile(){  //批量彻底删除
+	    	var allitems = $('tbody tr:not(.firstTr):has(:checked)');
+	    	var itemsLength = allitems.length;
+	    	if(itemsLength > 0) {
+	    		var fileId = new Array();
+	    		for(var i=0; i<itemsLength; i++){  //可批量删除
+	    			fileId.push($(allitems[i]).attr('id'));
+	    		}
+
+		    	$('#comDeleteDialog-comment').html(
+		    		'<p>彻底删除的文件将不会复原,</p>' +
+				    '<p>您确定要把文件彻底删除吗？</p>' +
+					'<p class="margin-top20">' +
+						'<button id="comDeleteDialog-cancel" onclick="hideDialog();" class="layerBootom">取消</button>' +
+						'<button id="comDeleteDialog-ok" class="layerBootom margin-right10">确定</button>' +
+					'</p>'
+		    	);
+
+		    	$('#comDeleteDialog-ok').unbind('click').click(function(){
+		    			sendData(fileId,function(){
+			    			updateLists();
+			    		});
+			    	   hideDialog();
+		    	});
+	    	}else{
+	    		$('#comDeleteDialog-comment').html('<p>请先选择要处理的文件！</p>');
+	    	}   	
+	    	
+	    	function sendData(fileId,callback){  
+		    		$.ajax({
+			            type:"post",
+			            dataType:"json",
+			            contentType:"application/x-www-form-urlencoded;charset=UTF-8",
+			            url:"{% url netPan.File.views.reDelFile%}",
+			            data:{
+			            	id: JSON.stringify(fileId)
+			            },
+			            success:function(data){
+			            	var message = data.message;
+			            	if(message == 'J'){
+			            		showInfo('彻底删除成功');
+			            		if(callback){
+			            			callback();
+			            		}
+			            		
+			            	}else if(message == 'K'){
+			            		showInfo('彻底删除失败');
+			            	}
+			            },
+			            error: function(xhr,textStatus,errorThrown){
+			            	
+			            }
+			            
+			        });
+	         }
+
+	    }
+
+	    function comDeleteSingleFile(_this){  //单个彻底删除
+	    	var id=$(_this).parent().parent().parent().parent().attr('id');
+	    	var fileId = new Array();
+	    	fileId.push(id);
+
+	    	$('#comDeleteDialog-comment').html(
+	    		'<p>彻底删除的文件将不会复原,</p>' +
+			    '<p>您确定要把文件彻底删除吗？</p>' +
+				'<p class="margin-top20">' +
+					'<button id="comDeleteDialog-cancel" onclick="hideDialog();" class="layerBootom">取消</button>' +
+					'<button id="comDeleteDialog-ok" class="layerBootom margin-right10">确定</button>' +
+				'</p>'
+	    	);
+
+	    	$('#comDeleteDialog-ok').unbind('click').click(function(){
+	    			sendData(fileId,function(){
+		    			updateLists();
+		    		});
+		    	   hideDialog();
+	    	});
+		     	
+	    	
+	    	function sendData(fileId,callback){  
+		    		$.ajax({
+			            type:"post",
+			            dataType:"json",
+			            contentType:"application/x-www-form-urlencoded;charset=UTF-8",
+			            url:"{% url netPan.File.views.reDelFile%}",
+			            data:{
+			            	id: JSON.stringify(fileId)
+			            },
+			            success:function(data){
+			            	var message = data.message;
+			            	if(message == 'J'){
+			            		showInfo('彻底删除成功');
+			            		if(callback){
+			            			callback();
+			            		}
+			            		
+			            	}else if(message == 'K'){
+			            		showInfo('彻底删除失败');
+			            	}
+			            },
+			            error: function(xhr,textStatus,errorThrown){
+			            	
+			            }
+			            
+			        });
+	         }
+
+	    }
+
+	    function updateLists(){
+	    	$.ajax({
+		            type:"post",
+		            dataType:"json",
+		            contentType:"application/x-www-form-urlencoded;charset=UTF-8",
+		            url:"{% url netPan.File.views.viewFile%}",
+		            data:{ },
+		            success:function(data){
+		            	var allFiles = JSON.parse(data.all_files);
+		            	if(allFiles.length != 0){
+		            		showLists(allFiles);
+		            	}else{
+		            		$('tbody').html('暂无数据记录');
+		            	}
+		            	
+		            },
+		            error: function(xhr,textStatus,errorThrown){
+		            	
+		            }
+		            
+		        });
+	    }
+
+	    function showLists(allFiles){
+	    		$('tbody').empty().append(
+	    				'<tr class="firstTr font-bold">' +
+							'<td width="8%"><input type="checkbox" id="selAll" onclick="selectAll();" />全选</td>' +
+							'<td>名称</td>' +
+							'<td>上传日期</td>' +
+							'<td>操作</td>' +
+				        '</tr>'
+				        );
+	    		for(var i=0; i<allFiles.length; i++){
+	    			var item = allFiles[i].fields;
+	    			var pk = allFiles[i].pk;
+	    			var is_folder = allFiles[i].fields.is_folder;
+	    			
+	    			if(is_folder == "0"){
+		    			$('tbody').append(
+		    				'<tr id='+ pk +' class="baseTr">' +
+								'<td><input type="checkbox" name="checkAll" id="checkAll" onclick="setSelectAll();"/></td>' +
+								'<td>' +
+								    '<img class="img-css" src="{{STATIC_URL}}img/png/file.png" />' 
+								     +item.name+
+								'</td>' +
+								'<td>'+item.upload_time+'</td>' +
+								'<td>' +
+									'<ul>' +
+										'<li><a href="#rebackDialog" rel="dialog" onclick="rebackSingleFile(this);"><img title="恢复" src="{{STATIC_URL}}img/png/small-in.png" /></a></li>' +
+										'<li><a href="#comDeleteDialog" rel="dialog" onclick="comDeleteSingleFile(this)"><img title="彻底删除" src="{{STATIC_URL}}img/png/clean.png" /></a></li>' +
+									'</ul>' +
+								'</td>' +
+							'</tr>'
+		    			);
+	    			}else{
+	    				$('tbody').append(
+	    				'<tr id='+ pk +' class="baseTr">' +
+							'<td><input type="checkbox" name="checkAll" id="checkAll" onclick="setSelectAll();"/></td>' +
+							'<td>' +
+							    '<img class="img-css" src="{{STATIC_URL}}img/png/folder.png" />' 
+							    +item.name +
+							'</td>' +
+							'<td>'+item.upload_time+'</td>' +
+							'<td>' +
+								'<ul>' +
+									'<li><a href="#rebackDialog" rel="dialog" onclick="rebackSingleFile(this);"><img title="恢复" src="{{STATIC_URL}}img/png/small-in.png" /></a></li>' +
+									'<li><a href="#comDeleteDialog" rel="dialog" onclick="comDeleteSingleFile(this)"><img title="彻底删除" src="{{STATIC_URL}}img/png/clean.png" /></a></li>' +
+								'</ul>' +
+							'</td>' +
+						'</tr>'
+	    			  );
+	    			}
+	    			
+
+	    		}
+
+	    		//必须写
+	    		$('#table').alterBgColor();
+	    		$("a[rel*=dialog]").leanModal({overlay:0.4, closeButton:".modal_close"}); //弹出框
+	    	}
+
+	function showDeleteLogs(){	//logs
+	    	$.ajax({
+	    		type:"post",
+		            dataType:"json",
+		            contentType:"application/x-www-form-urlencoded;charset=UTF-8",
+		            url:"{% url netPan.Log.views.trashLog%}",
+		            data:{},
+		            success:function(data){
+		            	var allFiles = JSON.parse(data.all_logs);
+		            	if(allFiles.length != 0){
+		            		showLogLists(allFiles);
+		            	}else{
+		            		$('tbody').html('暂无数据记录');
+		            	}
+			            	
+		            },
+		            error: function(xhr,textStatus,errorThrown){
+		            	
+		            }
+		            
+    	        });
+
+    	function showLogLists(allFiles){
+    		$('tbody').empty().append(
+				'<tr class="firstTr font-bold">' +
+					'<td>文件名</td>' +
+					'<td>操作</td>' +
+					'<td>时间</td>' +
+		        '</tr>'
+		        );
+
+    		for(var i=0; i<allFiles.length; i++){
+    			var fileName = allFiles[i].fields.name;
+    			var operation = allFiles[i].fields.operate;
+    			var time = (allFiles[i].fields.time).replace(/T/, " ");
+    			var transoperate;
+    			if(operation == 'D'){
+    				transoperate = '彻底删除';
+    			}else if(operation == 'R'){
+    				transoperate = '误删恢复';
+    			}
+				$('tbody').append(
+    				'<tr class="baseTr">' +
+						'<td>'+fileName+'</td>' +
+						'<td>'+transoperate+'</td>' +
+						'<td>'+time+'</td>' +
+					'</tr>'
+    			);
+
+    		}
+
+    	}
+	}
+
+
+</script>
+{% endblock %}
+
+
+
+
+
+
+
+
+
+
+

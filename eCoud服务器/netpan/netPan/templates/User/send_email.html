@@ -1,0 +1,16 @@
+{% load i18n %}{% load url from future %}{% autoescape off %}
+{% trans "Hello," %} {{ user }}
+{% blocktrans %}您收到这封邮件是因为您注册的帐号未激活！{% endblocktrans %}
+
+{% trans "请激活您注册的帐号:" %}
+{% block reset_link %}
+http://{{domain}}{% url 'netPan.User.views.Activated' email_code %}
+
+{% endblock %}
+
+
+{% trans "Thanks for using our site!" %}
+
+{% blocktrans %}The Ecloud team{% endblocktrans %}
+
+{% endautoescape %}

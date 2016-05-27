@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title></title>
+<!--以下css,js地址都要根据自己文件配置而改变-->
+{% load static %}{% get_static_prefix as STATIC_URL %}
+<link href="{{STATIC_URL}}uploadify/uploadify.css" type="text/css" rel="stylesheet" />
+<script type="text/javascript" src="{{STATIC_URL}}js/jquery-1.8.3.js"></script>
+<script type="text/javascript" src="{{STATIC_URL}}js/swfobject.js"></script>
+<script type="text/javascript" src="{{STATIC_URL}}uploadify/jquery.uploadify.min.js"></script>
+{%block t_head%}{%endblock%}
+
+</head>
+
+<body>
+
+<h1>Uploadify组件上传方式</h1>
+
+<div class="demo-box">
+    <input id="file_upload" type="file" name="file_upload" />
+    <div id="file_uploadQueue" class="uploadify-queue"></div>
+    <p>
+        <a href="javascript:$('#file_upload').uploadify('upload','*')">上传</a>  
+        <a href="javascript:$('#file_upload').uploadify('cancel')">取消第一个上传文件</a>  
+        <a href="javascript:$('#file_upload').uploadify('cancel','*')">取消所有文件上传</a>
+
+        <a href="javascript:changeBtnText()">改变按钮文字测试</a>
+        <a href="javascript:returnBtnText()">显示按钮文字测试</a>
+    </p>  
+
+    <div id="progress"></div>
+</div>
+<script type="text/javascript">
+    $(document).ready(function() {
+        var fileUrl = "test";
+      $('#file_upload').uploadify({
+        'swf': '{{STATIC_URL}}uploadify/uploadify.swf',
+        'uploader':'{% url netPan.File.views.uploadify_script %}',
+        'auto': false,//不自动上传
+        'multi': true,//设置可以上传多个文件
+       // 'queueSizeLimit':2, 
+        'itemTemplate': '<div id="${fileID}" class="uploadify-queue-item">\
+                            <div class="cancel">\
+                                <a href="javascript:$(\'#${instanceID}\').uploadify(\'cancel\', \'${fileID}\')">X</a>\
+                            </div>\
+                            <span class="fileName">${fileName} (${fileSize})</span><span class="data">
+                            </span>\
+                        </div>',
+        'buttonText':'请选择文件', //定义显示在默认按钮<input>上的文本
+        'removeCompleted':false,//使上传队列中的项目始终显示于队列中，直到点击了关闭按钮或者队列被清空。
+        'fileSizeLimit':10240000,//设置上传文件大小单位kb
+        'fileTypeExts':'*.pdf; *.gif; *.jpg; *.png; *.doc;*.docx;*.odt',//定义允许上传的文件后缀
+        'fileTypeDesc':'支持文档格式', //可选择的文件类型的描述。此字符串出现在浏览文件对话框的文件类型下拉菜单中               
+        'onInit': function () {},
+        'onError' : function (event,ID,fileObj,errorObj) {
+                $('#id_span_msg').html("上传失败，错误码:"+errorObj.type+" "+errorObj.info);
+            },
+        'onSelect': function (file) { //每添加一个文件至上传队列时触发该事件
+            alert(file.name + '文件添加至上传队列');
+        },
+        'onSelectError': function(){
+            alert(file.name + '文件返回错误，没有添加到队列中');
+            /*
+                file
+                返回错误的文件对象。
+
+                errorCode
+                返回的错误代码。在定义错误代码时可使用以下常量：
+                QUEUE_LIMIT_EXCEEDED – 选定的文件数量超过了设置的限值
+                FILE_EXCEEDS_SIZE_LIMIT – 文件的大小超过了设置的限值
+                ZERO_BYTE_FILE – 0大小文件
+                INVALID_FILETYPE – 文件类型不在设置的范围内
+
+                errorMsg
+                表示超过限值的错误信息。
+            */
+        },
+        'onCancel': function(file) {
+            alert('你确定要取消' +file.name+ '的上传吗？');
+
+        },
+        'onQueueComplete': function(file) { //队列中的所有文件被处理完成时触发该事件
+            alert(file.name + '上传成功'); //queueData.uploadsErrored (上传失败)
+        },
+        'onUploadStart': function(file){ //在开始上传之前的瞬间会触发该事件
+            $('#file_upload').uploadify("settings", "formData", {'fileUrl':fileUrl});
+
+        },
+        'onUploadProgress': function(file, bytesUploaded, bytesTotal, totalBytesUploaded, totalBytesTotal){ //上传进度更新时触发该事件
+            $('#progress').html('已上传 ' +totalBytesUploaded + ' 字节. ' + '共 ' +totalBytesTotal + ' 字节.');
+        },
+        'onUploadSuccess': function(file, data, response){//response:服务器端响应。上传成功为true，上传失败为false
+            alert('文件 ' + file.name + '上传成功.' + ' 详细信息: ' + response + ':' + data);
+        },
+        'onUploadError': function(file, errorCode, errorMsg, errorString){ //上传失败时触发该事件
+            alert('文件 ' + file.name + '上传失败.' + ' 详细信息: ' + errorString);
+        }
+      });
+    });
+    function changeBtnText(){
+        $('#file_upload').uploadify('settings','buttonText','测试');
+    }
+    function returnBtnText(){
+        alert('The button says ' + $('#file_upload').uploadify('settings','buttonText'));
+    }
+
+</script>
+</body>
+</html>

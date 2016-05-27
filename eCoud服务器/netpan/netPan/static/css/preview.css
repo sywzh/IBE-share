@@ -1,0 +1,156 @@
+/* sign task css by duym 2014/5/21*/
+body{
+	font-family:"Microsoft Yahei",Tahoma,Arial,STHeiti,sans-serif;
+	font-size:12px;
+}
+#taskboxContainer{
+	position:relative;
+	width:300px;
+	border:6px solid transparent;
+	border-image:url(../img/png/shadow.png) 6 6 repeat;
+	float:right;
+	background-color: #424242; /* fallback */
+    background-image: url(../img/png/texture.png),
+                    linear-gradient(hsla(0,0%,30%,.99), hsla(0,0%,25%,.95));
+    padding:10px;
+    max-height:1200px;
+    overflow-y:auto;
+    overflow-x:hidden;
+    margin-top:2px;
+
+}
+#task-operate{
+	width:100%;
+	height:auto;
+}
+#operate-selects{
+	margin-left:2%;
+	display:inline-block;
+	width:80%;
+	height:30px;
+	line-height:14px;
+	background-color:#fbfbfb;
+	-webkit-box-shadow:0 0px 10px rgba(0, 0, 0, 0.10);
+	box-shadow:0 0px 10px rgba(0, 0, 0, 0.10);
+	border-radius:3px;
+	text-align:center;
+	padding-top:11px;
+	margin-bottom:10px;
+}
+#newTask-btn{
+	display: inline-block;
+	
+}
+.singlecss{
+	margin: 0px 8px;
+}
+.back-color{
+	display:inline-block;
+	width:14%;
+	height:30px;
+	vertical-align:top;
+}
+
+/*comment*/
+#document-comment{
+	cursor:pointer;
+}
+
+/*sign task*/
+#newTask-btn{
+	cursor:pointer;
+}
+
+/*comment-task-lists*/
+#task-conment-content{
+	width:100%;
+	height:auto;
+	margin-bottom:10px;
+}
+
+/*selected write coment || selected sign task*/
+#text-area-taskuser{
+	background-color:#fff;
+	min-height:30px;
+}
+.divCss{
+	margin-left:2%;
+	display:inline-block;
+	width:80%;
+}
+.textarea-css{
+	border-radius:3px;
+	min-width:98%;
+	max-width:98%;
+	min-height:60px;
+	padding:2px;
+	margin:0px;
+
+}
+.block-btn-css{
+	height:26px;
+	text-align:center;
+	border-radius:4px;
+	display:block;
+	width:100%;
+	background-color:#636363;
+	color:#fff;
+	padding-top:5px;
+	border:1px solid #313131; /*#414141*/
+}
+.block-btn-css:hover{
+	cursor:pointer;
+	background-color:#5e5e5e;
+}
+.close-css{
+	background-color:#c4c4c4;
+	color:#fff;
+	font-weight:bold;
+	padding:0px 3px;
+	position:relative;
+	top:25px;
+	left:92%;
+	border-radius:3px;
+}
+.close-css:hover{
+	background-color:#979797;
+	cursor:pointer;
+}
+#other-operates{
+	margin-left:13%;
+}
+#conmentLists div.conmment-info-lists{
+	margin-left:0px;
+}
+#conmentLists div.single-conment-list span{
+	width:auto;
+	margin-left:;
+}
+.conmment-info-lists{
+	color:#e1e1e1;
+}
+.single-task-list{
+	border:1px solid #000;
+	color:#e1e1e1;
+	padding:5px;
+}
+.task-operate-lists{
+	text-align:right;
+}
+.task-operate-lists span{
+	font-size:11px;
+	margin-left:6px;
+
+}
+.task-operate-lists span:hover{
+	cursor:pointer;
+	color:#fff;
+	text-decoration:underline;
+}
+.single-task-list p{
+	margin-bottom:5px;
+}
+.singleTaskLists{
+	margin-top:10px;
+	margin-bottom:15px;
+}

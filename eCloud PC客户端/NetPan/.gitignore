@@ -1,0 +1,10 @@
+/Release
+/NetPan/Debug
+/NetPan/Release
+/ipch
+/_UpgradeReport_Files
+*.o
+*.d
+*.exe
+*.ilk
+*.pdb

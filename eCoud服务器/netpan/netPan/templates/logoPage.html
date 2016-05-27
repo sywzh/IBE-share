@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<title>云网盘</title>
+<meta name="description" content="">
+<meta name="keywords" content="">
+<style text="text/css">
+      #logo, #register-btn, #login-btn, .title, .title2{color:#fff;}
+</style>
+</head>
+<body>
+		<!--头部-->
+		<header>
+			<div id="logo"><img src="{{STATIC_URL}}img/png/logo.png" /></div>
+			<div id="login">
+				<div id="register">
+					<a id="register-btn" rel="leanModal" name="注册" href="#signUpModal">注册</a>
+				</div>
+				<div id="login_href">
+					<a id="login-btn" rel="leanModal" name="登录" href="#loginModal">登录</a>
+				</div>
+			</div>
+		</header>
+		<!--main-->
+		<div id="main">
+			<div class="title">It's Just for U</div>
+			<div  class="title2">云存储</div>
+          <div class="more" onclick="click_scroll();">More</div>
+			<div id="banner">
+				<img src="{{STATIC_URL}}img/banner.png">
+			</div>
+		</div>
+		
+		<!--说明-->
+		<div id="explain">
+			<div id="explain1">
+				<img src="{{STATIC_URL}}img/explain1.gif"></div>
+				<div id="txt1">explain1</div>
+
+			<div id="explain2">
+				<img src="{{STATIC_URL}}img/explain2.gif"></div>
+				<div id="txt2" >explain2</div>
+		</div>
+	   <!--底部-->
+		<footer>
+			<span>©2013-2014  云存储版权所有</span><br />
+			<span><a href="#">云存储</a></span>
+	    </footer>
+	  <!--登陆框-->
+		<div id="loginModal" class="baseBox" style="display:none;">
+			<div id="login-header" class="boxHeader">
+				<span>登 录</span>
+				<a id="login-close" class="modal_close" href="#" title="关闭"></a>
+			</div>
+			<form id="login-form" class="boxContent"></form>
+		</div>
+		<!--注册框-->
+		<div id="signUpModal" class="baseBox" style="display:none;">
+			<div id="signUp-header" class="boxHeader">
+				<span>注 册</span>
+				<a class="modal_close" href="#" title="关闭"></a>
+			</div>
+			<form id="signUp-form" name="registerForm" class="boxContent"></form>
+		</div>
+
+<!--放于页底,提高网页加载速度-->
+	{% load static %}{% get_static_prefix as STATIC_URL %}
+	<link href="{{STATIC_URL}}css/reset.css" rel="stylesheet" type="text/css" />
+	<script src="{{STATIC_URL}}js/jquery-1.8.3.js" type="text/javascript"></script>
+	<script type="text/javascript" src="{{STATIC_URL}}js/selfExtend.js"></script>
+	<script src="{{STATIC_URL}}js/jquery.leanModal.min.js" type="text/javascript"></script>
+	<script src="{{STATIC_URL}}js/conmon.js" type="text/javascript"></script>
+	<script type="text/javascript" src="{{STATIC_URL}}js/jquery.validate.min.js"></script>
+	<script type="text/javascript" src="{{STATIC_URL}}js/jquery.validate.messages_cn.js"></script>
+	<!--{%block t_head%}{%endblock%} -->
+
+    <script type="text/javascript">
+
+        //通过外部文件引用"{% url netPan.User.views.LoginHd%}"，浏览器无法识别
+		$(document).ready(function(){
+			$("a[rel*=leanModal]").leanModal({overlay:0.4, closeButton:".modal_close"}); //模块框设置
+			$('#register-btn').click(function(){
+				showregisterInputs();
+				sendRegisterData();
+			});
+
+			$('#login-btn').click(function(){
+				showLoginInputs();
+				sendLoginData();
+			});
+		    
+		});
+
+
+		//重建登陆下的输入框
+		function showLoginInputs(){
+			$('#login-form').html(
+				'<div class="infoWord" id="loginInfoWord">提示用户信息</div>' +
+				'<div>' +
+					'<label for="id_username">用户名:</label>' +
+					'<input id="id_username" class="input" name="loginusername" type="text"></input>' +
+				'</div>' +
+				'<div>' +
+					'<label for="id_password">密码:</label>' +
+					'<input id="id_password" class="input" name="loginpassword" type="password"></input>' +
+				'</div>' +
+				'<div id="login-submit" style="margin-top:20px;">登 录</div>' + 
+				'<div class="forgetPW"><a href="{%url django.contrib.auth.views.password_reset%}" rel="forgetPW">忘记密码 ?</a></div>'
+			);
+		}
+
+		//重建注册下的输入框
+		function showregisterInputs(){
+			$('#signUp-form').html(
+				'<div class="infoWord" id="registerInfoWord"></div>' +
+				'<div>' +
+					'<label for="register_username">用户名:</label>' +
+					'<input id="register_username" name="username" type="text"></input>' +
+				'</div>' +
+				'<div>' +
+					'<label for="register_email">邮箱:</label>' +
+					'<input id="register_email" name="email" type="text"></input>' +
+				'</div>' +
+				'<div>' +
+					'<label for="register_password">密码:</label>' +
+					'<input id="register_password" name="password" type="password"></input>' +
+				'</div>' +
+				'<div>' +
+					'<label for="register_re_password">重复密码:</label>' +
+					'<input id="register_re_password" name="re_password" type="password"></input>' +
+				'</div>' +
+				'<div id="signUp-submit" style="margin-top:20px;">注 册</div>'
+			);
+		}
+		function validateForm(){
+			var options = {
+				rules: {
+					username: {
+						required: true,
+						userCheck: true,
+						minlength: 6,
+						maxlength: 12
+					},
+					email:{
+						required: true,
+						emailCheck: true
+					},
+					password:{
+						required: true,
+						passCheck: true,
+						minlength: 6,
+						maxlength: 16
+					},
+					re_password:{
+						required: true,
+						equalTo: "#register_password"
+					}
+				},
+				messages: {
+					username: {
+						required: '请输入用户名',
+						userCheck: '输入只能包含汉字、字母、数字',
+						minlength: '输入长度要求6—12位',
+						maxlength: '输入长度要求6—12位'
+					},
+					email:{
+						required: '请输入邮箱',
+						emailCheck: '请输入正确格式的电子邮件'
+					},
+					password:{
+						required: '请输入密码',
+						passCheck: '输入只能包含字母、数字和特殊字符!@#$%&',
+						minlength: '密码长度要求6—16位',
+						maxlength: '密码长度要求6—16位'
+					},
+					re_password:{
+						required: '请再次输入密码',
+						equalTo: '前后密码输入不一致'
+					}
+				},
+				errorElement: "span" ,
+				errorPlacement: function(error, element){
+					//错误提示加载
+					error.appendTo(element.parent());
+				}
+			};
+			$('#signUp-form').validate(options);
+		}
+
+		function loginvalidateForm(){
+			var options = {
+				rules: {
+					loginusername: {
+						required: true,
+						userCheck: true,
+						minlength: 3,    //暂时为3位，以后要改成6位
+						maxlength: 12
+					},
+					loginpassword:{
+						required: true,
+						passCheck: true,
+						minlength: 6,
+						maxlength: 16
+					}
+				},
+				messages: {
+					loginusername: {
+						required: '请输入用户名',
+						userCheck: '输入只能包含汉字、字母、数字',
+						minlength: '输入长度要求3—12位',
+						maxlength: '输入长度要求3—12位'
+					},
+					loginpassword:{
+						required: '请输入密码',
+						passCheck: '输入只能包含字母、数字和特殊字符!@#$%&',
+						minlength: '密码长度要求6—16位',
+						maxlength: '密码长度要求6—16位'
+					}
+				},
+				errorElement: "span" ,
+				errorPlacement: function(error, element){
+					//错误提示加载
+					error.appendTo(element.parent());
+				}
+			};
+			$('#login-form').validate(options);
+		}
+
+		function sendLoginData(){
+			loginvalidateForm();
+			$(document).keydown(function(event){
+		   		if(event.keyCode == 13){    //绑定回车
+		   			$('#login-submit').click();
+		   		}
+			});
+
+			$('#login-submit').click(function(){
+				if($('#login-form').valid()==false){
+					return false;
+			    }
+
+				var username = $('#id_username').val();
+				var password = $('#id_password').val();
+				$.ajax({
+		            type:"post",
+		            dataType:"json",
+		            contentType:"application/x-www-form-urlencoded;charset=UTF-8",
+		            url:"{% url netPan.User.views.LoginHd%}",
+		            data:{
+		                username: username,
+		                password: password
+		            },
+		            beforeSend: function(){
+		            	//提示信息，提高用户体验度
+		            	$('#loginInfoWord').show().text('正在处理，请稍后...');
+		            },
+		            success:function(data){
+		            	var message = data.message;
+		                if(message == 'D'){
+		                	//提示信息，提高用户体验度
+		                	$('#loginInfoWord').show().text('登陆成功，正在跳转...');
+		                	window.location.href = '{% url netPan.index.IndexHd%}';
+		                	
+		                }else if(message == 'C'){
+		                	$('#loginInfoWord').show().text('用户名或密码错误');
+		                }else if(message == 'N'){
+		                	$('#loginInfoWord').show().text('您还没有注册！');
+		                }else if(message == 'H'){
+		                	$('#loginInfoWord').show().text('您还未激活账号，快登录邮箱激活账号吧！');
+		                }
+		            },
+		            error: function(xhr,textStatus,errorThrown){
+		            	$('#loginInfoWord').show().text('发生异常:'+errorThrown);
+		            }
+		            
+		        });
+			});
+        
+		}
+
+		function sendRegisterData(){
+			validateForm();
+			$(document).keydown(function(event){
+		   		if(event.keyCode == 13){    //绑定回车
+		   			$('#signUp-submit').click();
+		   		}
+			});
+			$('#signUp-submit').click(function(){
+				if($('#signUp-form').valid()==false){
+					return false;
+			    }
+				var username = $('#register_username').val();
+				var email = $('#register_email').val();
+				var password = $('#register_password').val();
+				$.ajax({
+			            type:"post",
+			            dataType:'json',
+			            contentType:"application/x-www-form-urlencoded;charset=UTF-8",
+			            url:"{% url netPan.User.views.RegisterHd%}",
+			            data:{
+			                username: username,
+			                email: email,
+			                password: password
+			            },
+			            beforeSend: function(){
+			            	//提示信息，提高用户体验度
+			            	$('#registerInfoWord').show().text('正在处理，请稍后...');
+			            },
+			            success:function(data){
+			            	var message = data.message;
+			                if(message == 'I'){
+			                	$('#registerInfoWord').text('注册成功，快登录邮箱激活账号吧！');
+			                	//延迟10秒关闭注册框
+			                	setTimeout("$('#login-close').click();",10000);
+			                	
+			                }else if(message == 'A'){
+			                	$('#registerInfoWord').text('用户名已注册，请重新输入');
+			                }else if(message == 'B'){
+			                	$('#registerInfoWord').text('邮箱已注册，请重新输入');
+			                }else if(message == 'J'){
+			                	$('#registerInfoWord').text('注册失败，请重新输入...');
+			                }
+			            },
+			            error: function(xhr,textStatus,errorThrown){
+			            	$('#registerInfoWord').text('发生异常:' + errorThrown);
+			            } 
+			        });
+			});
+	}
+	</script>
+</body>	
+</html>
+
+
